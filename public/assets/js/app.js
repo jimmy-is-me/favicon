@@ -350,4 +350,42 @@
     els.acquire.disabled = loading;
     if (loading) {
       els.status.textContent = '偵測中';
-      els.st
+      els.status.className = 'status-badge loading';
+    }
+  }
+
+  function iconProxyUrl(url, download = false) {
+    let value = '/api/icon?url=' + encodeURIComponent(url);
+    if (download) value += '&download=1';
+    return value;
+  }
+
+  function sourceName(source) {
+    const names = {
+      html: 'HTML 宣告',
+      manifest: 'Web App Manifest',
+      common: '常見路徑',
+      meta: 'Meta 宣告',
+    };
+    return names[source] || source || '未知來源';
+  }
+
+  function safeHost() {
+    try { return new URL(state.pageUrl).hostname.replace(/[^a-z0-9.-]+/gi, '-'); }
+    catch (_) { return 'site'; }
+  }
+
+  async function copyText(text, successMessage) {
+    if (!text) {
+      showToast('目前沒有可複製的內容');
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (_) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textar
