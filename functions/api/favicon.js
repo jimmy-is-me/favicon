@@ -216,4 +216,110 @@ function extractLinkIcons(html, baseUrl) {
     const attrs = parseAttributes(tag);
     const rel = String(attrs.rel || '').toLowerCase();
     const href = attrs.href;
-    
+    if (!href) continue;
+    const isIcon = /(^|\s)icon(\s|$)/.test(rel) || rel.includes('shortcut icon') || rel.includes('apple-touch-icon') || rel.includes('mask-icon') || rel.includes('fluid-icon');
+    if (!isIcon) continue;
+    try {
+      const url = new URL(href, baseUrl);
+      assertSafeTarget(url);
+      out.push({
+        url: url.href,
+        label: rel.includes('apple') ? 'Apple Touch Icon' : rel.includes('mask') ? 'Mask Icon' : 'HTML Favicon',
+        source: 'html',
+        rel,
+        sizes: attrs.sizes || '',
+        declaredType: attrs.type || '',
+        priority: rel.includes('apple') ? 92 : 100
+      });
+    } catch (_) {}
+  }
+  return out;
+}
+
+function extractManifestLinks(html, baseUrl) {
+  const out = [];
+  const tags = html.match(/<link\b[^>]*>/gi) || [];
+  for (const tag of tags) {
+    const attrs = parseAttributes(tag);
+    const rel = String(attrs.rel || '').toLowerCase();
+    if (!attrs.href || !rel.split(/\s+/).includes('manifest')) continue;
+    try {
+      const url = new URL(attrs.href, baseUrl);
+      assertSafeTarget(url);
+      out.push({ url: url.href });
+    } catch (_) {}
+  }
+  return out;
+}
+
+function extractMetaIcons(html, baseUrl) {
+  const out = [];
+  const tags = html.match(/<meta\b[^>]*>/gi) || [];
+  for (const tag of tags) {
+    const attrs = parseAttributes(tag);
+    const name = String(attrs.name || attrs.property || '').toLowerCase();
+    if (!attrs.content) continue;
+    if (!['msapplication-tileimage', 'msapplication-square70x70logo', 'msapplication-square150x150logo', 'msapplication-square310x310logo'].includes(name)) continue;
+    try {
+      const url = new URL(attrs.content, baseUrl);
+      assertSafeTarget(url);
+      out.push({ url: url.href, label: 'Microsoft Tile Icon', source: 'meta', priority: 78 });
+    } catch (_) {}
+  }
+  return out;
+}
+
+async function loadManifestIcons(manifestUrl) {
+  const url = normalizeHttpUrl(manifestUrl);
+  assertSafeTarget(url);
+  const response = await safeFetchWithTimeout(url.href, {
+    headers: { 'User-Agent': 'FaviconDetector/1.1', 'Accept': 'application/manifest+json,application/json,text/plain;q=0.8,*/*;q=0.2' }
+  }, 5000);
+  if (!response.ok) throw new Error('manifest unavailable');
+  const finalUrl = new URL(response.url || url.href);
+  assertSafeTarget(finalUrl);
+  const text = (await response.text()).slice(0, 600_000);
+  const manifest = JSON.parse(text);
+  if (!Array.isArray(manifest.icons)) return [];
+  return manifest.icons.slice(0, 10).flatMap((icon) => {
+    if (!icon || !icon.src) return [];
+    try {
+      const iconUrl = new URL(icon.src, finalUrl);
+      assertSafeTarget(iconUrl);
+      return [{
+        url: iconUrl.href,
+        label: 'Manifest Icon',
+        source: 'manifest',
+        sizes: icon.sizes || '',
+        declaredType: icon.type || '',
+        purpose: icon.purpose || '',
+        priority: 96
+      }];
+    } catch (_) { return []; }
+  });
+}
+
+function commonCandidates(pageUrl) {
+  const origin = pageUrl.origin;
+  return [
+    { url: origin + '/favicon.ico', label: 'favicon.ico', source: 'common', priority: 88 },
+    { url: origin + '/favicon.svg', label: 'favicon.svg', source: 'common', priority: 86 },
+    { url: origin + '/favicon.png', label: 'favicon.png', source: 'common', priority: 84 },
+    { url: origin + '/apple-touch-icon.png', label: 'Apple Touch Icon', source: 'common', priority: 80 },
+    { url: origin + '/apple-touch-icon-precomposed.png', label: 'Apple Touch Icon Precomposed', source: 'common', priority: 78 },
+    { url: origin + '/icon-192.png', label: 'PWA Icon 192', source: 'common', priority: 64 },
+    { url: origin + '/icon-512.png', label: 'PWA Icon 512', source: 'common', priority: 63 }
+  ];
+}
+
+function dedupeCandidates(items) {
+  const map = new Map();
+  for (const item of items) {
+    if (!item || !item.url) continue;
+    let key;
+    try {
+      const parsed = new URL(item.url);
+      parsed.hash = '';
+      assertSafeTarget(parsed);
+      key = parsed.href;
+    } catch (_) { continue;
