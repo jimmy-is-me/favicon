@@ -234,4 +234,32 @@
       els.largePreview.innerHTMHH	Ϝܘ[��h$:)�z/"yaiyi,y�eϋܜ[��΂�[˜�]�Y]ә]K�^ۛ�[�H	�c��i⹭��g`9c빠my�+;/a�.蹤!�h$:)�z/"yaiyi,y�e�ࠉ΂�NB���[�ݚ[ۈ\]T�]�Y]ә]J
 HY�
 \ݘ]K�ٛXݙY
-H[˜�]�Y]ә]K�^�
+H[˜�]�Y]ә]K�^�ntent = '尚未選擇圖示';
+      return;
+    }
+    const natural = state.previewWidth && state.previewHeight ? `${state.previewWidth} × ${state.previewHeight}` : '尺寸讀取中';
+    els.previewMeta.textContent = `原始尺寸：${natural}　｜　類型：${state.selected.contentType || '未知'}　｜　PNG 輸出：${els.size.value} × ${els.size.value}`;
+  }
+
+  async function downloadOriginal() {
+    if (!state.selected) return;
+    const link = document.createElement('a');
+    link.href = iconProxyUrl(state.selected.url, true);
+    link.rel = 'noopener';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  }
+
+  async function downloadPng() {
+    if (!state.selected) return;
+    const size = Number(els.size.value) || 128;
+    try {
+      const img = await loadImage(iconProxyUrl(state.selected.url));
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, size, size);
+
+      const sourceW = img
