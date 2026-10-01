@@ -296,4 +296,29 @@
   }
 
   function openOriginal() {
-    if (!st
+    if (!state.selected) return;
+    window.open(iconProxyUrl(state.selected.url), '_blank', 'noopener');
+  }
+
+  function loadImage(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+
+  async function checkApi() {
+    els.checkApi.disabled = true;
+    els.diagnostic.className = 'diagnostic-body';
+    els.diagnostic.textContent = '正在檢查 /api/favicon …';
+    try {
+      const response = await fetch('/api/favicon?url=' + encodeURIComponent('https://example.com/'), { cache: 'no-store' });
+      const data = await response.json();
+      if (!response.ok || !data || !data.ok) throw new Error((data && data.error) || `HTTP ${response.status}`);
+      els.diagnostic.className = 'diagnostic-body good';
+      els.diagnostic.textContent = 'API 正常：Cloudflare Pages Functions 已部署，可以進行跨網域 Favicon 偵測。';
+    } catch (error) {
+      els.diagnostic.className = 'diagnostic-body bad';
+   
