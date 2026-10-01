@@ -266,4 +266,34 @@
       const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, size, size);
 
-      const sourceW = img
+      const sourceW = img.naturalWidth || size;
+      const sourceH = img.naturalHeight || size;
+      const scale = Math.min(size / sourceW, size / sourceH);
+      const drawW = Math.max(1, Math.round(sourceW * scale));
+      const drawH = Math.max(1, Math.round(sourceH * scale));
+      const x = Math.round((size - drawW) / 2);
+      const y = Math.round((size - drawH) / 2);
+      ctx.drawImage(img, x, y, drawW, drawH);
+
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          showToast('PNG 轉檔失敗');
+          return;
+        }
+        const objectUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = objectUrl;
+        a.download = `favicon-${safeHost()}-${size}x${size}.png`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+        showToast('PNG 已產生');
+      }, 'image/png');
+    } catch (_) {
+      showToast('無法轉成 PNG');
+    }
+  }
+
+  function openOriginal() {
+    if (!st
