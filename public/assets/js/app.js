@@ -104,4 +104,106 @@
       state.pageUrl = data.pageUrl || url;
       state.icons = Array.isArray(data.icons) ? data.icons : [];
       els.summaryDomain.textContent = data.hostname || parsed.hostname;
-      els.summaryCount.textContent = Str
+      els.summaryCount.textContent = String(state.icons.length);
+      renderResults(state.icons);
+      populateAcquire(state.icons, data.preferredUrl || '');
+
+      els.status.textContent = state.icons.length ? '偵測完成' : '未找到圖示';
+      els.status.className = 'status-badge ' + (state.icons.length ? 'ok' : 'error');
+
+      if (data.warnings && data.warnings.length) {
+        showNotice(data.warnings.join(' '));
+      }
+
+      if (scrollToAcquire) {
+        els.acquireSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } catch (error) {
+      const message = error && error.message ? error.message : '未知錯誤';
+      els.status.textContent = '偵測失敗';
+      els.status.className = 'status-badge error';
+      els.results.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">!</div>
+          <strong>無法連線到偵測 API</strong>
+          <span>${escapeHtml(message)}<br>如果你是直接雙擊 index.html 或只上傳 public 資料夾，Functions 不會運作。請依 README 將整個專案部署到 Cloudflare Pages。</span>
+        </div>`;
+      showNotice('這個版本需要 Cloudflare Pages Functions。完整 ZIP 內已包含 functions/api/favicon.js 與 functions/api/icon.js。');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function renderResults(icons) {
+    if (!icons.length) {
+      els.results.innerHTML = '<div class="empty-state"><div class="empty-icon">?</div><strong>沒有找到可使用的 Favicon</strong><span>網站可能沒有設定圖示，或目標站阻擋了伺服器端請求。</span></div>';
+      return;
+    }
+
+    els.results.innerHTML = '';
+    icons.forEach((icon, index) => {
+      const item = document.createElement('article');
+      item.className = 'result-item';
+
+      const proxyUrl = iconProxyUrl(icon.url);
+      const sourceLabel = sourceName(icon.source);
+      const sizeLabel = icon.sizes ? `宣告 ${icon.sizes}` : '';
+      const typeLabel = icon.contentType || 'image/*';
+
+      item.innerHTML = `
+        <div class="result-preview"><img src="${escapeAttr(proxyUrl)}" alt="" loading="lazy"></div>
+        <div class="result-info">
+          <strong>${escapeHtml(icon.label || `Favicon ${index + 1}`)}</strong>
+          <div class="result-url">${escapeHtml(icon.url)}</div>
+          <div class="tags">
+            <span class="tag good">可使用</span>
+            <span class="tag">${escapeHtml(sourceLabel)}</span>
+            <span class="tag">${escapeHtml(typeLabel)}</span>
+            ${sizeLabel ? `<span class="tag">${escapeHtml(sizeLabel)}</span>` : ''}
+            ${icon.fallback ? '<span class="tag warn">備援來源</span>' : ''}
+          </div>
+        </div>
+        <div class="result-actions">
+          <button class="small-button primary choose-button" type="button">使用這個</button>
+          <button class="small-button copy-button" type="button">複製網址</button>
+        </div>`;
+
+      item.querySelector('.choose-button').addEventListener('click', () => {
+        selectIcon(icon.url);
+        els.acquireSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      item.querySelector('.copy-button').addEventListener('click', () => copyText(icon.url, 'Favicon URL 已複製'));
+      els.results.appendChild(item);
+    });
+  }
+
+  function populateAcquire(icons, preferredUrl) {
+    els.source.innerHTML = '';
+    if (!icons.length) {
+      resetAcquire();
+      return;
+    }
+
+    icons.forEach((icon, index) => {
+      const option = document.createElement('option');
+      option.value = icon.url;
+      option.textContent = `${icon.label || 'Favicon'}${icon.url === preferredUrl || (!preferredUrl && index === 0) ? '（建議）' : ''}`;
+      els.source.appendChild(option);
+    });
+
+    els.source.disabled = false;
+    selectIcon(preferredUrl && icons.some((icon) => icon.url === preferredUrl) ? preferredUrl : icons[0].url);
+  }
+
+  function selectFromDropdown() {
+    selectIcon(els.source.value);
+  }
+
+  function selectIcon(url) {
+    const icon = state.icons.find((entry) => entry.url === url);
+    if (!icon) return;
+
+    state.selected = icon;
+    els.source.value = icon.url;
+    els.faviconUrl.value = icon.url;
+    els.htmlTag.value = `<link rel="icon" href="${ic
