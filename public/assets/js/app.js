@@ -384,4 +384,40 @@ H[˜�]�Y]ә]K�^�ntent = '尚未選擇圖示';
       textarea.style.position = 'fixed';
       textarea.style.opacity = '0';
       document.body.appendChild(textarea);
-      textar
+      textarea.select();
+      document.execCommand('copy');
+      textarea.remove();
+    }
+    showToast(successMessage);
+  }
+
+  function showNotice(message) {
+    els.notice.textContent = message;
+    els.notice.classList.remove('hidden');
+  }
+
+  function hideNotice() {
+    els.notice.textContent = '';
+    els.notice.classList.add('hidden');
+  }
+
+  function showToast(message) {
+    els.toast.textContent = message;
+    els.toast.classList.add('show');
+    clearTimeout(showToast.timer);
+    showToast.timer = setTimeout(() => els.toast.classList.remove('show'), 1800);
+  }
+
+  function escapeHtml(value = '') {
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function escapeAttr(value = '') {
+    return escapeHtml(value);
+  }
+})();
