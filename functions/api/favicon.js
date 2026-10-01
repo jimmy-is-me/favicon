@@ -322,4 +322,108 @@ function dedupeCandidates(items) {
       parsed.hash = '';
       assertSafeTarget(parsed);
       key = parsed.href;
-    } catch (_) { continue;
+    } catch (_) { continue; }
+    if (!map.has(key) || scoreCandidate(item) > scoreCandidate(map.get(key))) map.set(key, { ...item, url: key });
+  }
+  return [...map.values()].sort((a, b) => scoreCandidate(b) - scoreCandidate(a));
+}
+
+async function verifyCandidates(candidates, concurrency = 4) {
+  const results = new Array(candidates.length);
+  let nextIndex = 0;
+  async function worker() {
+    while (true) {
+      const index = nextIndex++;
+      if (index >= candidates.length) return;
+      results[index] = await verifyOne(candidates[index]);
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(concurrency, candidates.length || 1) }, () => worker()));
+  return results;
+}
+
+async function verifyOne(item) {
+  try {
+    const url = normalizeHttpUrl(item.url);
+    assertSafeTarget(url);
+    const response = await safeFetchWithTimeout(url.href, {
+      headers: {
+        'User-Agent': 'FaviconDetector/1.1',
+        'Accept': 'image/avif,image/webp,image/svg+xml,image/*,*/*;q=0.2',
+        'Range': `bytes=0-${VERIFY_PREFIX_BYTES - 1}`
+      }
+    }, 5000);
+
+    if (!response.ok && response.status !== 206) return { ...item, ok: false, status: response.status };
+    const finalUrl = new URL(response.url || item.url);
+    assertSafeTarget(finalUrl);
+    const bytes = await readPrefixLimited(response, VERIFY_PREFIX_BYTES);
+    const detectedType = detectImageType(bytes);
+    if (!detectedType) return { ...item, ok: false, status: response.status };
+
+    return {
+      ...item,
+      url: finalUrl.href,
+      ok: true,
+      status: response.status,
+      contentType: detectedType,
+      contentLength: Number(response.headers.get('content-length') || 0) || 0
+    };
+  } catch (_) {
+    return { ...item, ok: false };
+  }
+}
+
+function detectImageType(bytes) {
+  if (!bytes || bytes.length < 4) return '';
+  if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) return 'image/png';
+  if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return 'image/jpeg';
+  const ascii6 = ascii(bytes, 0, 6);
+  if (ascii6 === 'GIF87a' || ascii6 === 'GIF89a') return 'image/gif';
+  if (ascii(bytes, 0, 4) === 'RIFF' && ascii(bytes, 8, 12) === 'WEBP') return 'image/webp';
+  if (bytes[0] === 0x00 && bytes[1] === 0x00 && bytes[2] === 0x01 && bytes[3] === 0x00) return 'image/x-icon';
+  if (ascii(bytes, 4, 8) === 'ftyp') {
+    const brand = ascii(bytes, 8, 12).toLowerCase();
+    if (brand === 'avif' || brand === 'avis') return 'image/avif';
+  }
+  const text = new TextDecoder().decode(bytes.slice(0, Math.min(bytes.length, 4096))).replace(/^\uFEFF/, '').trimStart();
+  if (/^(?:<\?xml[^>]*>\s*)?(?:<!--[^]*?-->\s*)*<svg\b/i.test(text)) return 'image/svg+xml';
+  return '';
+}
+
+function ascii(bytes, start, end) {
+  if (bytes.length < end) return '';
+  return String.fromCharCode(...bytes.slice(start, end));
+}
+
+function parseAttributes(tag) {
+  const attrs = {};
+  const regex = /([:\w-]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+))/g;
+  let match;
+  while ((match = regex.exec(tag))) attrs[match[1].toLowerCase()] = match[2] ?? match[3] ?? match[4] ?? '';
+  return attrs;
+}
+
+function scoreCandidate(item) {
+  const base = Number(item.priority || 0);
+  const sizeBonus = /\b(512|384|256|192|180|152|144|128)\b/.test(item.sizes || '') ? 3 : 0;
+  return base + sizeBonus;
+}
+
+function friendlyError(error) {
+  const message = String(error?.message || error || '偵測失敗');
+  if (/abort|timeout/i.test(message)) return '連線目標網站逾時';
+  return message;
+}
+
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      'content-type': 'application/json; charset=utf-8',
+      'cache-control': 'no-store',
+      'x-content-type-options': 'nosniff',
+      'referrer-policy': 'no-referrer'
+    }
+  });
+}
