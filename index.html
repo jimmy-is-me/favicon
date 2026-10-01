@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="description" content="輸入網站網址，透過 Cloudflare Pages Functions 真正讀取網站 HTML 並偵測、預覽與下載 Favicon。">
+  <title>Favicon Detector｜偵測與獲取工具</title>
+  <link rel="stylesheet" href="/public/assets/css/style.css">
+  <script src="/public/assets/js/app.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="eyebrow">FAVICON TOOL</div>
+      <h1>Favicon 偵測＋獲取</h1>
+      <p class="hero-copy">
+        這版不是只靠瀏覽器猜路徑，而是透過 Cloudflare Pages Functions 從伺服器端讀取目標網站的 HTML、Manifest 與常見 Favicon 路徑，再提供預覽、下載與 HTML 標籤。
+      </p>
+
+      <form class="searchbar" id="detectForm" novalidate>
+        <label class="sr-only" for="urlInput">網站網址</label>
+        <input id="urlInput" name="url" type="text" inputmode="url" autocomplete="url" spellcheck="false" placeholder="https://example.com/">
+        <button class="button button-primary" id="detectButton" type="submit">開始偵測</button>
+        <button class="button button-soft" id="acquireButton" type="button">偵測並取得</button>
+      </form>
+    </section>
+
+    <div class="top-grid">
+      <section class="card results-card">
+        <div class="card-head">
+          <div>
+            <h2>即時偵測結果</h2>
+            <p>會解析網站 HTML 宣告、Web App Manifest 與常見根目錄圖示。</p>
+          </div>
+          <span class="status-badge" id="statusBadge">尚未偵測</span>
+        </div>
+
+        <div class="notice hidden" id="apiNotice"></div>
+        <div class="results" id="results">
+          <div class="empty-state">
+            <div class="empty-icon">◎</div>
+            <strong>輸入網址後即可開始偵測</strong>
+            <span>部署至 Cloudflare Pages 後，後端 Function 會替你跨網域讀取網站。</span>
+          </div>
+        </div>
+      </section>
+
+      <aside class="card summary-card">
+        <div class="card-head">
+          <div>
+            <h2>偵測摘要</h2>
+            <p>會優先選擇網站自己宣告、且實際可存取的圖示。</p>
+          </div>
+        </div>
+
+        <div class="summary-body">
+          <div class="summary-box">
+            <span class="summary-label">DOMAIN</span>
+            <strong id="summaryDomain">—</strong>
+            <div class="summary-count" id="summaryCount">0</div>
+            <span>個可使用 Favicon</span>
+          </div>
+
+          <div class="summary-item">
+            <strong>HTML / Manifest 真實解析</strong>
+            <p>可找到 WordPress Site Icon、非標準資料夾圖示、Apple Touch Icon 與 PWA Manifest icons。</p>
+          </div>
+          <div class="summary-item">
+            <strong>不受瀏覽器 CORS 限制</strong>
+            <p>跨網域抓取由 Cloudflare Pages Functions 執行，前端只連自己的 <code>/api</code>。</p>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <section class="card acquire-card" id="acquireSection">
+      <div class="card-head">
+        <div>
+          <h2>Favicon 獲取</h2>
+          <p>選擇偵測結果後，可下載原始檔、轉成指定尺寸 PNG、複製原始網址或 HTML。</p>
+        </div>
+        <span class="status-badge" id="acquireStatus">等待偵測</span>
+      </div>
+
+      <div class="acquire-layout">
+        <div class="large-preview" id="largePreview">
+          <span>Favicon 預覽</span>
+        </div>
+
+        <div class="acquire-controls">
+          <div class="field-grid">
+            <label class="field">
+              <span>選擇圖示</span>
+              <select id="sourceSelect" disabled>
+                <option>尚無資料</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>PNG 輸出尺寸</span>
+              <select id="sizeSelect">
+                <option value="16">16 × 16</option>
+                <option value="32">32 × 32</option>
+                <option value="48">48 × 48</option>
+                <option value="64">64 × 64</option>
+                <option value="128" selected>128 × 128</option>
+                <option value="180">180 × 180</option>
+                <option value="192">192 × 192</option>
+                <option value="256">256 × 256</option>
+                <option value="512">512 × 512</option>
+              </select>
+            </label>
+          </div>
+
+          <label class="field">
+            <span>原始 Favicon URL</span>
+            <div class="copy-row">
+              <input id="faviconUrl" type="text" readonly placeholder="偵測後顯示">
+              <button class="small-button" type="button" id="copyUrlButton">複製</button>
+            </div>
+          </label>
+
+          <label class="field">
+            <span>HTML 標籤</span>
+            <div class="copy-row">
+              <input id="htmlTag" type="text" readonly placeholder="偵測後顯示">
+              <button class="small-button" type="button" id="copyHtmlButton">複製</button>
+            </div>
+          </label>
+
+          <div class="preview-meta" id="previewMeta">尚未選擇圖示</div>
+
+          <div class="action-row">
+            <button class="button button-primary" type="button" id="downloadOriginalButton" disabled>下載原始檔</button>
+            <button class="button button-soft" type="button" id="downloadPngButton" disabled>下載 PNG</button>
+            <button class="button button-outline" type="button" id="openOriginalButton" disabled>開啟原圖</button>
+          </div>
+
+          <p class="hint">下載與 PNG 轉檔會透過本站 <code>/api/icon</code> 取得圖片。圖示的著作權、商標及其他權利仍屬原權利人；下載不代表取得重製、散布或商標使用授權。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card diagnostic-card">
+      <div class="card-head">
+        <div>
+          <h2>部署檢查</h2>
+          <p>如果按鈕沒反應，這裡可以快速確認目前是不是只有靜態 HTML，而沒有部署 Functions。</p>
+        </div>
+        <button class="button button-outline" type="button" id="checkApiButton">檢查 API</button>
+      </div>
+      <div class="diagnostic-body" id="diagnosticBody">
+        尚未檢查。正式部署後應可存取 <code>/api/favicon?url=https://example.com</code>。
+      </div>
+    </section>
+
+    <section class="card legal-card">
+      <div class="card-head">
+        <div>
+          <h2>使用與權利說明</h2>
+          <p>本工具只依使用者指定網址，即時讀取公開網站所提供的 Favicon 資訊；本專案不內建、不收錄第三方網站圖示或品牌 Logo。</p>
+        </div>
+      </div>
+      <div class="legal-body">
+        <p>網站圖示可能受著作權、商標權或其他權利保護。偵測、預覽或下載功能僅提供技術上的檔案存取，不代表任何權利授權。若要將第三方圖示用於自己的網站、產品、宣傳或再次散布，請先確認你具有相應權利或授權。</p>
+        <p>請勿利用本工具存取未授權的內部網路、規避存取限制、進行大量自動化抓取，或從事違反適用法律、網站條款或第三方權利的用途。</p>
+      </div>
+    </section>
+
+    <footer>
+      Favicon Detector · Cloudflare Pages Functions 版 · 不內建第三方圖示
+    </footer>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
