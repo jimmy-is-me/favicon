@@ -321,4 +321,33 @@
       els.diagnostic.textContent = 'API 正常：Cloudflare Pages Functions 已部署，可以進行跨網域 Favicon 偵測。';
     } catch (error) {
       els.diagnostic.className = 'diagnostic-body bad';
-   
+      els.diagnostic.textContent = 'API 無法使用：' + (error && error.message ? error.message : '未知錯誤') + '。請確認整個專案（包含 functions 資料夾）一起部署，Build output directory 設為 public。';
+    } finally {
+      els.checkApi.disabled = false;
+    }
+  }
+
+  function resetAcquire() {
+    state.icons = [];
+    state.selected = null;
+    state.previewWidth = 0;
+    state.previewHeight = 0;
+    els.source.disabled = true;
+    els.source.innerHTML = '<option>尚無資料</option>';
+    els.faviconUrl.value = '';
+    els.htmlTag.value = '';
+    els.largePreview.innerHTML = '<span>Favicon 預覽</span>';
+    els.previewMeta.textContent = '尚未選擇圖示';
+    els.acquireStatus.textContent = '等待偵測';
+    els.acquireStatus.className = 'status-badge';
+    els.downloadOriginal.disabled = true;
+    els.downloadPng.disabled = true;
+    els.openOriginal.disabled = true;
+  }
+
+  function setLoading(loading) {
+    els.detect.disabled = loading;
+    els.acquire.disabled = loading;
+    if (loading) {
+      els.status.textContent = '偵測中';
+      els.st
