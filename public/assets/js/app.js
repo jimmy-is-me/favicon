@@ -206,4 +206,36 @@
     state.selected = icon;
     els.source.value = icon.url;
     els.faviconUrl.value = icon.url;
-    els.htmlTag.value = `<link rel="icon" href="${ic
+    els.htmlTag.value = `<link rel="icon" href="${icon.url}">`;
+    els.acquireStatus.textContent = '可取得';
+    els.acquireStatus.className = 'status-badge ok';
+    els.downloadOriginal.disabled = false;
+    els.downloadPng.disabled = false;
+    els.openOriginal.disabled = false;
+
+    loadLargePreview(icon);
+  }
+
+  function loadLargePreview(icon) {
+    state.previewWidth = 0;
+    state.previewHeight = 0;
+    els.largePreview.innerHTML = '<span>載入預覽中…</span>';
+    const img = new Image();
+    img.alt = icon.label || 'Favicon';
+    img.src = iconProxyUrl(icon.url);
+    img.onload = () => {
+      state.previewWidth = img.naturalWidth || 0;
+      state.previewHeight = img.naturalHeight || 0;
+      els.largePreview.innerHTML = '';
+      els.largePreview.appendChild(img);
+      updatePreviewMeta();
+    };
+    img.onerror = () => {
+      els.largePreview.innerHTML = '<span>預覽載入失敗</span>';
+      els.previewMeta.textContent = '原始網址可偵測，但代理預覽載入失敗。';
+    };
+  }
+
+  function updatePreviewMeta() {
+    if (!state.selected) {
+      els.previewMeta.textCo
