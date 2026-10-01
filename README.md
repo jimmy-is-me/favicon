@@ -106,3 +106,14 @@ npm run dev
 更完整的第三方 Favicon、商標、授權、隱私與公開部署注意事項請見 [LEGAL.md](./LEGAL.md) 與 [COPYRIGHT.md](./COPYRIGHT.md)。
 
 > 本專案已避免內建第三方 Logo / Favicon / 圖片與抄錄他站內容，但實際部署與使用仍應遵守所在地法律、目標網站條款及第三方權利；沒有任何一般性技術檢查能保證所有司法管轄區與所有使用方式都完全零風險。
+
+## Cloudflare Pages 首頁位置
+
+正式建議的 Pages 結構仍是 `public/index.html` 搭配根目錄 `functions/`，Build output directory 請設為 `public`。這也是 Cloudflare Pages Functions 官方建議的結構。
+
+為了避免 Pages 專案誤把 repository 根目錄當成輸出目錄時直接 404，本專案另外保留一份根目錄 `index.html` 相容入口。兩種情況如下：
+
+- **建議設定：** Build output directory = `public` → 使用 `public/index.html`
+- **相容模式：** Build output directory = repository root → 使用根目錄 `index.html`
+
+若要完整使用 Favicon 偵測 API，仍需確認根目錄的 `functions/` 有被 Cloudflare Pages Functions 部署。
