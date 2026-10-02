@@ -6,10 +6,14 @@
   <meta name="theme-color" content="#0f766e">
   <meta name="description" content="繁體中文 Favicon 工具箱：偵測網站現有圖示，或用文字快速產生 favicon.ico、PNG 與網站圖示包。">
   <title>Favicon 工具箱｜偵測、取得與文字產生</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/public/assets/css/style.css">
   <link rel="stylesheet" href="/public/assets/css/toolbox.css">
   <script src="/public/assets/js/app.js" defer></script>
   <script src="/public/assets/js/text-to-favicon.js" defer></script>
+  <script src="/public/assets/js/image-to-favicon.js" defer></script>
 </head>
 <body>
   <main class="shell">
@@ -28,6 +32,10 @@
         <button class="tool-tab" type="button" data-tool-target="generatorView" role="tab" aria-selected="false">
           <span class="tool-tab-kicker">產生</span>
           文字轉 Favicon
+        </button>
+        <button class="tool-tab" type="button" data-tool-target="imageView" role="tab" aria-selected="false">
+          <span class="tool-tab-kicker">圖片</span>
+          圖片轉 Favicon
         </button>
       </div>
     </section>
@@ -202,6 +210,7 @@
               <label class="field">
                 <span>字體</span>
                 <select id="textFontFamily">
+                  <option value="'Noto Serif TC','Noto Serif CJK TC','Songti TC',serif" selected>Noto Serif TC</option>
                   <option value="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">系統黑體</option>
                   <option value="'Microsoft JhengHei', 'PingFang TC', 'Noto Sans TC', sans-serif">繁中黑體</option>
                   <option value="Georgia, 'Times New Roman', serif">襯線字體</option>
@@ -371,6 +380,185 @@
       </section>
     </section>
 
+
+    <section class="tool-view hidden" id="imageView" data-tool-view>
+      <section class="card generator-card">
+        <div class="card-head generator-head">
+          <div>
+            <span class="section-kicker">IMAGE TO FAVICON</span>
+            <h2>圖片轉 Favicon</h2>
+            <p>上傳 PNG、JPG 或 JPEG，直接裁切與縮放成網站圖示。圖片只在瀏覽器本機處理，不會上傳到伺服器。</p>
+          </div>
+          <span class="status-badge ok">本機處理</span>
+        </div>
+
+        <div class="image-converter-layout">
+          <div>
+            <label class="upload-zone" id="imageUploadZone">
+              <input id="imageFileInput" type="file" accept="image/png,image/jpeg,.png,.jpg,.jpeg">
+              <span class="upload-icon">＋</span>
+              <strong>選擇圖片，或拖曳到這裡</strong>
+              <p>支援 PNG / JPG / JPEG，建議使用正方形、邊長 512px 以上的圖片。檔案上限 20MB。</p>
+            </label>
+
+            <div class="upload-meta">
+              <span id="imageFileName">尚未選擇圖片</span>
+              <span id="imageFileInfo">—</span>
+            </div>
+
+            <div class="image-control-grid">
+              <label class="field">
+                <span>圖片填滿方式</span>
+                <select id="imageFitMode">
+                  <option value="contain" selected>完整顯示（留白）</option>
+                  <option value="cover">填滿裁切</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>輸出形狀</span>
+                <select id="imageShape">
+                  <option value="rounded" selected>圓角方形</option>
+                  <option value="square">正方形</option>
+                  <option value="circle">圓形</option>
+                  <option value="soft">大圓角</option>
+                </select>
+              </label>
+            </div>
+
+            <label class="range-field">
+              <span>圖片內距 <b id="imagePaddingValue">8%</b></span>
+              <input id="imagePadding" type="range" min="0" max="30" value="8">
+            </label>
+
+            <div class="color-grid">
+              <div class="color-field">
+                <span>背景顏色</span>
+                <div class="color-input-row">
+                  <input id="imageBgColor" type="color" value="#ffffff" aria-label="圖片背景顏色">
+                  <input id="imageBgColorHex" type="text" value="#ffffff" maxlength="7" aria-label="圖片背景色色碼">
+                </div>
+              </div>
+              <label class="toggle-card">
+                <span>
+                  <strong>透明背景</strong>
+                  <small>PNG 可保留透明效果</small>
+                </span>
+                <input id="imageTransparent" type="checkbox" checked>
+                <i aria-hidden="true"></i>
+              </label>
+            </div>
+
+            <p class="image-action-note">提示：如果原圖是橫式 Logo，建議使用「完整顯示」並保留一些內距；如果原圖已經是正方形圖示，可用「填滿裁切」。</p>
+          </div>
+
+          <aside class="image-preview-panel">
+            <div class="generator-preview-title">
+              <div>
+                <span>轉換預覽</span>
+                <small>輸出前先確認小尺寸是否仍清楚</small>
+              </div>
+              <span class="live-dot">即時</span>
+            </div>
+
+            <div class="image-preview-stage">
+              <div class="image-empty" id="imagePreviewEmpty">選擇圖片後，這裡會顯示 Favicon 預覽。</div>
+              <canvas class="hidden" id="imagePreviewLarge" width="512" height="512" aria-label="圖片 Favicon 大型預覽"></canvas>
+            </div>
+
+            <div class="mini-preview-row">
+              <div class="mini-preview-item">
+                <canvas id="imagePreviewSmall" width="64" height="64" aria-label="圖片 Favicon 小型預覽"></canvas>
+                <div><strong>32 × 32</strong><span>瀏覽器分頁</span></div>
+              </div>
+              <div class="browser-tab-mock">
+                <canvas id="imagePreviewTab" width="32" height="32" aria-hidden="true"></canvas>
+                <span>我的網站</span>
+              </div>
+            </div>
+
+            <button class="button button-primary generator-download" type="button" id="downloadImagePackButton" disabled>下載完整網站圖示包 ZIP</button>
+            <div class="secondary-downloads">
+              <button class="button button-soft" type="button" id="downloadImageIcoButton" disabled>下載 favicon.ico</button>
+              <button class="button button-outline" type="button" id="downloadImagePngButton" disabled>下載 512 PNG</button>
+            </div>
+            <p class="hint centered-hint">輸出會包含瀏覽器、Apple Touch Icon、Android / PWA 常用尺寸。</p>
+          </aside>
+        </div>
+      </section>
+    </section>
+
+    <section class="card favicon-guide">
+      <div class="card-head">
+        <div>
+          <span class="section-kicker">FAVICON 基礎說明</span>
+          <h2>Favicon 是什麼？為什麼網站需要它？</h2>
+          <p>如果你第一次接觸 Favicon，這裡整理最常用的概念與安裝方式。</p>
+        </div>
+      </div>
+
+      <div class="guide-intro">
+        <div class="guide-big-mark"><span>W</span></div>
+        <div class="guide-copy">
+          <h3>Favicon 就是「網站的小圖示」</h3>
+          <p>Favicon 是 Favorite Icon 的簡稱，通常會顯示在瀏覽器分頁標題左側、書籤、瀏覽紀錄、手機主畫面捷徑，以及部分搜尋結果或系統介面中。</p>
+          <p>它不是網站主 Logo 的替代品，而是 Logo 的「超小尺寸版本」。因為實際顯示常只有 16×16 或 32×32 像素，所以圖形需要簡單、對比清楚，太細的文字或複雜圖案在縮小後通常看不清楚。</p>
+          <p>現在的網站通常不只準備一個 <code>favicon.ico</code>，還會搭配 PNG、Apple Touch Icon 與 Web App Manifest，讓不同瀏覽器、iPhone / iPad、Android 與 PWA 都能取得合適尺寸。</p>
+        </div>
+      </div>
+
+      <div class="guide-grid">
+        <article class="guide-card">
+          <b>16 × 16 / 32 × 32</b>
+          <p>最常見的瀏覽器分頁與書籤尺寸。圖示在這麼小的尺寸下仍應該能辨識。</p>
+        </article>
+        <article class="guide-card">
+          <b>180 × 180</b>
+          <p>Apple Touch Icon 常用尺寸，當 iPhone 或 iPad 使用者把網站加入主畫面時使用。</p>
+        </article>
+        <article class="guide-card">
+          <b>192 × 192 / 512 × 512</b>
+          <p>Android、PWA 與高解析度環境常用，通常會寫入 <code>site.webmanifest</code>。</p>
+        </article>
+      </div>
+
+      <div class="install-steps">
+        <h3>這個工具怎麼用？</h3>
+        <div class="install-list">
+          <div class="install-item">
+            <strong>已有網站：先偵測</strong>
+            <span>輸入網址，確認網站目前設定了哪些 Favicon，以及真正的圖示檔案放在哪裡。</span>
+          </div>
+          <div class="install-item">
+            <strong>沒有圖示：文字或圖片產生</strong>
+            <span>可以輸入品牌縮寫做圖示，或上傳自己的 PNG / JPG Logo 轉成完整尺寸。</span>
+          </div>
+          <div class="install-item">
+            <strong>下載後放進網站</strong>
+            <span>將 ZIP 解壓縮，把圖示檔放到網站根目錄，再把工具提供的 <code>&lt;link&gt;</code> 標籤加進頁面 <code>&lt;head&gt;</code>。</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-list">
+        <div class="faq-item">
+          <strong>一定要用 .ico 嗎？</strong>
+          <p>不一定。現代瀏覽器支援 PNG、SVG 等格式，但保留 <code>favicon.ico</code> 仍有助於相容傳統瀏覽器與部分工具。</p>
+        </div>
+        <div class="faq-item">
+          <strong>為什麼換了 Favicon 還看到舊圖？</strong>
+          <p>瀏覽器、CDN 與網站快取都可能保存舊圖示。更新後可以清除網站快取、Cloudflare 快取與瀏覽器快取再確認。</p>
+        </div>
+        <div class="faq-item">
+          <strong>WordPress 也需要自己放檔案嗎？</strong>
+          <p>不一定。WordPress 可在「網站圖示 / Site Icon」設定圖片；這個工具則適合檢查實際輸出結果、取得圖示，或替純 HTML 網站準備完整圖示包。</p>
+        </div>
+        <div class="faq-item">
+          <strong>圖片轉換會上傳我的 Logo 嗎？</strong>
+          <p>不會。圖片轉 Favicon 與文字轉 Favicon 都在瀏覽器端以 Canvas 處理，只有網站 Favicon 偵測功能會透過 Cloudflare Pages Functions 讀取你指定的公開網址。</p>
+        </div>
+      </div>
+    </section>
+
     <section class="card legal-card">
       <div class="card-head">
         <div>
@@ -380,7 +568,7 @@
       </div>
       <div class="legal-body">
         <p>網站偵測功能僅依使用者指定網址，即時讀取公開網站自行提供的 Favicon。第三方網站圖示可能受著作權、商標權或其他權利保護，下載不代表取得使用或散布授權。</p>
-        <p>文字轉 Favicon 會使用瀏覽器可用的系統字體繪製，不會下載或打包第三方字型檔。使用者仍應確認自己輸入的文字、名稱或商標具有適當使用權。</p>
+        <p>文字轉與圖片轉 Favicon 都在瀏覽器本機處理。本站介面使用 Noto Serif TC 網頁字型；使用者仍應確認自己輸入的文字、品牌名稱、商標與上傳圖片具有適當使用權。</p>
       </div>
     </section>
 
