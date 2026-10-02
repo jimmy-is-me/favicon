@@ -4,171 +4,388 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0f766e">
-  <meta name="description" content="輸入網站網址，透過 Cloudflare Pages Functions 真正讀取網站 HTML 並偵測、預覽與下載 Favicon。">
-  <title>Favicon Detector｜偵測與獲取工具</title>
+  <meta name="description" content="繁體中文 Favicon 工具箱：偵測網站現有圖示，或用文字快速產生 favicon.ico、PNG 與網站圖示包。">
+  <title>Favicon 工具箱｜偵測、取得與文字產生</title>
   <link rel="stylesheet" href="/public/assets/css/style.css">
+  <link rel="stylesheet" href="/public/assets/css/toolbox.css">
   <script src="/public/assets/js/app.js" defer></script>
+  <script src="/public/assets/js/text-to-favicon.js" defer></script>
 </head>
 <body>
   <main class="shell">
-    <section class="hero">
-      <div class="eyebrow">FAVICON TOOL</div>
-      <h1>Favicon 偵測＋獲取</h1>
+    <section class="hero toolbox-hero">
+      <div class="eyebrow">FAVICON 工具箱</div>
+      <h1>網站圖示，一站處理</h1>
       <p class="hero-copy">
-        這版不是只靠瀏覽器猜路徑，而是透過 Cloudflare Pages Functions 從伺服器端讀取目標網站的 HTML、Manifest 與常見 Favicon 路徑，再提供預覽、下載與 HTML 標籤。
+        偵測網站現有 Favicon、取得原始圖示，或直接用文字產生一套可部署的網站圖示。全站以繁體中文操作，不需安裝額外軟體。
       </p>
 
-      <form class="searchbar" id="detectForm" novalidate>
-        <label class="sr-only" for="urlInput">網站網址</label>
-        <input id="urlInput" name="url" type="text" inputmode="url" autocomplete="url" spellcheck="false" placeholder="https://example.com/">
-        <button class="button button-primary" id="detectButton" type="submit">開始偵測</button>
-        <button class="button button-soft" id="acquireButton" type="button">偵測並取得</button>
-      </form>
+      <div class="tool-switch" role="tablist" aria-label="Favicon 工具切換">
+        <button class="tool-tab active" type="button" data-tool-target="detectorView" role="tab" aria-selected="true">
+          <span class="tool-tab-kicker">偵測</span>
+          網站 Favicon 偵測
+        </button>
+        <button class="tool-tab" type="button" data-tool-target="generatorView" role="tab" aria-selected="false">
+          <span class="tool-tab-kicker">產生</span>
+          文字轉 Favicon
+        </button>
+      </div>
     </section>
 
-    <div class="top-grid">
-      <section class="card results-card">
+    <section class="tool-view" id="detectorView" data-tool-view>
+      <section class="card start-card">
+        <div class="card-head compact-head">
+          <div>
+            <h2>偵測網站 Favicon</h2>
+            <p>輸入網址後，由 Cloudflare Pages Functions 解析 HTML、Manifest 與常見網站圖示路徑。</p>
+          </div>
+        </div>
+        <div class="start-card-body">
+          <form class="searchbar" id="detectForm" novalidate>
+            <label class="sr-only" for="urlInput">網站網址</label>
+            <input id="urlInput" name="url" type="text" inputmode="url" autocomplete="url" spellcheck="false" placeholder="https://example.com/">
+            <button class="button button-primary" id="detectButton" type="submit">開始偵測</button>
+            <button class="button button-soft" id="acquireButton" type="button">偵測並取得</button>
+          </form>
+        </div>
+      </section>
+
+      <div class="top-grid">
+        <section class="card results-card">
+          <div class="card-head">
+            <div>
+              <h2>即時偵測結果</h2>
+              <p>優先找網站自己宣告且實際可以讀取的圖示。</p>
+            </div>
+            <span class="status-badge" id="statusBadge">尚未偵測</span>
+          </div>
+
+          <div class="notice hidden" id="apiNotice"></div>
+          <div class="results" id="results">
+            <div class="empty-state">
+              <div class="empty-icon">◎</div>
+              <strong>輸入網址後即可開始偵測</strong>
+              <span>部署至 Cloudflare Pages 後，後端 Function 會替你跨網域讀取公開網站資訊。</span>
+            </div>
+          </div>
+        </section>
+
+        <aside class="card summary-card">
+          <div class="card-head">
+            <div>
+              <h2>偵測摘要</h2>
+              <p>快速確認找到幾個可使用的 Favicon。</p>
+            </div>
+          </div>
+
+          <div class="summary-body">
+            <div class="summary-box">
+              <span class="summary-label">網域</span>
+              <strong id="summaryDomain">—</strong>
+              <div class="summary-count" id="summaryCount">0</div>
+              <span>個可使用 Favicon</span>
+            </div>
+
+            <div class="summary-item">
+              <strong>HTML / Manifest 解析</strong>
+              <p>可找到 WordPress Site Icon、Apple Touch Icon、PWA 圖示與非標準資料夾中的網站圖示。</p>
+            </div>
+            <div class="summary-item">
+              <strong>伺服器端偵測</strong>
+              <p>跨網域讀取由 Cloudflare Pages Functions 執行，不依賴瀏覽器直接讀取第三方網站。</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <section class="card acquire-card" id="acquireSection">
         <div class="card-head">
           <div>
-            <h2>即時偵測結果</h2>
-            <p>會解析網站 HTML 宣告、Web App Manifest 與常見根目錄圖示。</p>
+            <h2>Favicon 取得</h2>
+            <p>選擇偵測結果後，可下載原始檔、轉成指定尺寸 PNG、複製原始網址或 HTML。</p>
           </div>
-          <span class="status-badge" id="statusBadge">尚未偵測</span>
+          <span class="status-badge" id="acquireStatus">等待偵測</span>
         </div>
 
-        <div class="notice hidden" id="apiNotice"></div>
-        <div class="results" id="results">
-          <div class="empty-state">
-            <div class="empty-icon">◎</div>
-            <strong>輸入網址後即可開始偵測</strong>
-            <span>部署至 Cloudflare Pages 後，後端 Function 會替你跨網域讀取網站。</span>
+        <div class="acquire-layout">
+          <div class="large-preview" id="largePreview">
+            <span>Favicon 預覽</span>
+          </div>
+
+          <div class="acquire-controls">
+            <div class="field-grid">
+              <label class="field">
+                <span>選擇圖示</span>
+                <select id="sourceSelect" disabled>
+                  <option>尚無資料</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>PNG 輸出尺寸</span>
+                <select id="sizeSelect">
+                  <option value="16">16 × 16</option>
+                  <option value="32">32 × 32</option>
+                  <option value="48">48 × 48</option>
+                  <option value="64">64 × 64</option>
+                  <option value="128" selected>128 × 128</option>
+                  <option value="180">180 × 180</option>
+                  <option value="192">192 × 192</option>
+                  <option value="256">256 × 256</option>
+                  <option value="512">512 × 512</option>
+                </select>
+              </label>
+            </div>
+
+            <label class="field">
+              <span>原始 Favicon URL</span>
+              <div class="copy-row">
+                <input id="faviconUrl" type="text" readonly placeholder="偵測後顯示">
+                <button class="small-button" type="button" id="copyUrlButton">複製</button>
+              </div>
+            </label>
+
+            <label class="field">
+              <span>HTML 標籤</span>
+              <div class="copy-row">
+                <input id="htmlTag" type="text" readonly placeholder="偵測後顯示">
+                <button class="small-button" type="button" id="copyHtmlButton">複製</button>
+              </div>
+            </label>
+
+            <div class="preview-meta" id="previewMeta">尚未選擇圖示</div>
+
+            <div class="action-row">
+              <button class="button button-primary" type="button" id="downloadOriginalButton" disabled>下載原始檔</button>
+              <button class="button button-soft" type="button" id="downloadPngButton" disabled>下載 PNG</button>
+              <button class="button button-outline" type="button" id="openOriginalButton" disabled>開啟原圖</button>
+            </div>
+
+            <p class="hint">下載與 PNG 轉檔會透過本站 <code>/api/icon</code> 取得圖片。第三方網站圖示的權利仍屬原權利人。</p>
           </div>
         </div>
       </section>
 
-      <aside class="card summary-card">
+      <section class="card diagnostic-card">
         <div class="card-head">
           <div>
-            <h2>偵測摘要</h2>
-            <p>會優先選擇網站自己宣告、且實際可存取的圖示。</p>
+            <h2>部署檢查</h2>
+            <p>快速確認 Cloudflare Pages Functions 是否有正常部署。</p>
           </div>
+          <button class="button button-outline" type="button" id="checkApiButton">檢查 API</button>
         </div>
-
-        <div class="summary-body">
-          <div class="summary-box">
-            <span class="summary-label">DOMAIN</span>
-            <strong id="summaryDomain">—</strong>
-            <div class="summary-count" id="summaryCount">0</div>
-            <span>個可使用 Favicon</span>
-          </div>
-
-          <div class="summary-item">
-            <strong>HTML / Manifest 真實解析</strong>
-            <p>可找到 WordPress Site Icon、非標準資料夾圖示、Apple Touch Icon 與 PWA Manifest icons。</p>
-          </div>
-          <div class="summary-item">
-            <strong>不受瀏覽器 CORS 限制</strong>
-            <p>跨網域抓取由 Cloudflare Pages Functions 執行，前端只連自己的 <code>/api</code>。</p>
-          </div>
+        <div class="diagnostic-body" id="diagnosticBody">
+          尚未檢查。正式部署後應可存取 <code>/api/favicon?url=https://example.com</code>。
         </div>
-      </aside>
-    </div>
-
-    <section class="card acquire-card" id="acquireSection">
-      <div class="card-head">
-        <div>
-          <h2>Favicon 獲取</h2>
-          <p>選擇偵測結果後，可下載原始檔、轉成指定尺寸 PNG、複製原始網址或 HTML。</p>
-        </div>
-        <span class="status-badge" id="acquireStatus">等待偵測</span>
-      </div>
-
-      <div class="acquire-layout">
-        <div class="large-preview" id="largePreview">
-          <span>Favicon 預覽</span>
-        </div>
-
-        <div class="acquire-controls">
-          <div class="field-grid">
-            <label class="field">
-              <span>選擇圖示</span>
-              <select id="sourceSelect" disabled>
-                <option>尚無資料</option>
-              </select>
-            </label>
-            <label class="field">
-              <span>PNG 輸出尺寸</span>
-              <select id="sizeSelect">
-                <option value="16">16 × 16</option>
-                <option value="32">32 × 32</option>
-                <option value="48">48 × 48</option>
-                <option value="64">64 × 64</option>
-                <option value="128" selected>128 × 128</option>
-                <option value="180">180 × 180</option>
-                <option value="192">192 × 192</option>
-                <option value="256">256 × 256</option>
-                <option value="512">512 × 512</option>
-              </select>
-            </label>
-          </div>
-
-          <label class="field">
-            <span>原始 Favicon URL</span>
-            <div class="copy-row">
-              <input id="faviconUrl" type="text" readonly placeholder="偵測後顯示">
-              <button class="small-button" type="button" id="copyUrlButton">複製</button>
-            </div>
-          </label>
-
-          <label class="field">
-            <span>HTML 標籤</span>
-            <div class="copy-row">
-              <input id="htmlTag" type="text" readonly placeholder="偵測後顯示">
-              <button class="small-button" type="button" id="copyHtmlButton">複製</button>
-            </div>
-          </label>
-
-          <div class="preview-meta" id="previewMeta">尚未選擇圖示</div>
-
-          <div class="action-row">
-            <button class="button button-primary" type="button" id="downloadOriginalButton" disabled>下載原始檔</button>
-            <button class="button button-soft" type="button" id="downloadPngButton" disabled>下載 PNG</button>
-            <button class="button button-outline" type="button" id="openOriginalButton" disabled>開啟原圖</button>
-          </div>
-
-          <p class="hint">下載與 PNG 轉檔會透過本站 <code>/api/icon</code> 取得圖片。圖示的著作權、商標及其他權利仍屬原權利人；下載不代表取得重製、散布或商標使用授權。</p>
-        </div>
-      </div>
+      </section>
     </section>
 
-    <section class="card diagnostic-card">
-      <div class="card-head">
-        <div>
-          <h2>部署檢查</h2>
-          <p>如果按鈕沒反應，這裡可以快速確認目前是不是只有靜態 HTML，而沒有部署 Functions。</p>
+    <section class="tool-view hidden" id="generatorView" data-tool-view>
+      <section class="card generator-card">
+        <div class="card-head generator-head">
+          <div>
+            <span class="section-kicker">TEXT TO FAVICON</span>
+            <h2>文字轉 Favicon</h2>
+            <p>輸入 1–2 個字最清楚，也支援中英文、數字與 Emoji。所有圖示都在你的瀏覽器內即時產生。</p>
+          </div>
+          <span class="status-badge ok">純前端產生</span>
         </div>
-        <button class="button button-outline" type="button" id="checkApiButton">檢查 API</button>
-      </div>
-      <div class="diagnostic-body" id="diagnosticBody">
-        尚未檢查。正式部署後應可存取 <code>/api/favicon?url=https://example.com</code>。
-      </div>
+
+        <div class="generator-layout">
+          <div class="generator-controls">
+            <div class="generator-field-grid">
+              <label class="field wide-field">
+                <span>圖示文字</span>
+                <input id="textIconInput" type="text" value="W" maxlength="4" autocomplete="off" spellcheck="false">
+                <small>建議 1–2 個字；最多 4 個字元。</small>
+              </label>
+
+              <label class="field">
+                <span>字體</span>
+                <select id="textFontFamily">
+                  <option value="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">系統黑體</option>
+                  <option value="'Microsoft JhengHei', 'PingFang TC', 'Noto Sans TC', sans-serif">繁中黑體</option>
+                  <option value="Georgia, 'Times New Roman', serif">襯線字體</option>
+                  <option value="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">等寬字體</option>
+                </select>
+              </label>
+
+              <label class="field">
+                <span>字重</span>
+                <select id="textFontWeight">
+                  <option value="500">中等</option>
+                  <option value="600">半粗體</option>
+                  <option value="700" selected>粗體</option>
+                  <option value="800">特粗</option>
+                  <option value="900">最粗</option>
+                </select>
+              </label>
+            </div>
+
+            <label class="range-field">
+              <span>文字大小 <b id="textFontSizeValue">68%</b></span>
+              <input id="textFontSize" type="range" min="38" max="82" value="68">
+            </label>
+
+            <div class="color-grid">
+              <div class="color-field">
+                <span>文字顏色</span>
+                <div class="color-input-row">
+                  <input id="textColor" type="color" value="#ffffff" aria-label="文字顏色">
+                  <input id="textColorHex" type="text" value="#ffffff" maxlength="7" aria-label="文字顏色色碼">
+                </div>
+              </div>
+              <div class="color-field">
+                <span>背景顏色</span>
+                <div class="color-input-row">
+                  <input id="textBgColor" type="color" value="#0f766e" aria-label="背景顏色">
+                  <input id="textBgColorHex" type="text" value="#0f766e" maxlength="7" aria-label="背景顏色色碼">
+                </div>
+              </div>
+            </div>
+
+            <div class="palette-block">
+              <span>快速配色</span>
+              <div class="palette-row" id="textPalette">
+                <button type="button" class="palette-dot" data-fg="#ffffff" data-bg="#0f766e" style="--swatch:#0f766e" aria-label="墨綠"></button>
+                <button type="button" class="palette-dot" data-fg="#ffffff" data-bg="#111827" style="--swatch:#111827" aria-label="深黑"></button>
+                <button type="button" class="palette-dot" data-fg="#ffffff" data-bg="#2563eb" style="--swatch:#2563eb" aria-label="藍色"></button>
+                <button type="button" class="palette-dot" data-fg="#ffffff" data-bg="#7c3aed" style="--swatch:#7c3aed" aria-label="紫色"></button>
+                <button type="button" class="palette-dot" data-fg="#ffffff" data-bg="#dc2626" style="--swatch:#dc2626" aria-label="紅色"></button>
+                <button type="button" class="palette-dot" data-fg="#111827" data-bg="#facc15" style="--swatch:#facc15" aria-label="黃色"></button>
+                <button type="button" class="palette-dot" data-fg="#111827" data-bg="#f8fafc" style="--swatch:#f8fafc" aria-label="白色"></button>
+                <button type="button" class="palette-dot" data-fg="#ffffff" data-bg="#000000" style="--swatch:#000000" aria-label="黑色"></button>
+              </div>
+            </div>
+
+            <div class="generator-option-grid">
+              <label class="field">
+                <span>背景形狀</span>
+                <select id="textShape">
+                  <option value="rounded" selected>圓角方形</option>
+                  <option value="square">正方形</option>
+                  <option value="circle">圓形</option>
+                  <option value="soft">大圓角</option>
+                </select>
+              </label>
+
+              <label class="toggle-card">
+                <span>
+                  <strong>透明背景</strong>
+                  <small>只保留文字</small>
+                </span>
+                <input id="textTransparent" type="checkbox">
+                <i aria-hidden="true"></i>
+              </label>
+            </div>
+
+            <label class="range-field">
+              <span>內距 <b id="textPaddingValue">10%</b></span>
+              <input id="textPadding" type="range" min="0" max="26" value="10">
+            </label>
+
+            <label class="toggle-card shadow-toggle">
+              <span>
+                <strong>文字陰影</strong>
+                <small>在較大的圖示尺寸增加層次</small>
+              </span>
+              <input id="textShadow" type="checkbox">
+              <i aria-hidden="true"></i>
+            </label>
+          </div>
+
+          <aside class="generator-preview-panel">
+            <div class="generator-preview-title">
+              <div>
+                <span>即時預覽</span>
+                <small>大型預覽與瀏覽器分頁尺寸</small>
+              </div>
+              <span class="live-dot">即時</span>
+            </div>
+
+            <div class="generator-preview-stage">
+              <canvas id="textPreviewLarge" width="512" height="512" aria-label="Favicon 大型預覽"></canvas>
+            </div>
+
+            <div class="mini-preview-row">
+              <div class="mini-preview-item">
+                <canvas id="textPreviewSmall" width="64" height="64" aria-label="32 像素預覽"></canvas>
+                <div><strong>32 × 32</strong><span>瀏覽器分頁</span></div>
+              </div>
+              <div class="browser-tab-mock">
+                <canvas id="textPreviewTab" width="32" height="32" aria-hidden="true"></canvas>
+                <span>我的網站</span>
+              </div>
+            </div>
+
+            <button class="button button-primary generator-download" type="button" id="downloadFaviconPackButton">下載網站圖示包 ZIP</button>
+            <div class="secondary-downloads">
+              <button class="button button-soft" type="button" id="downloadIcoButton">下載 favicon.ico</button>
+              <button class="button button-outline" type="button" id="downloadTextPngButton">下載 512 PNG</button>
+            </div>
+            <p class="hint centered-hint">ZIP 內含 ICO、16/32/48/180/192/512 PNG 與 <code>site.webmanifest</code>。</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="feature-grid" aria-label="文字轉 Favicon 功能特色">
+        <article class="feature-card">
+          <span class="feature-icon">字</span>
+          <strong>文字直接變圖示</strong>
+          <p>不用準備 Logo 圖檔，輸入文字就能快速做出乾淨的網站圖示。</p>
+        </article>
+        <article class="feature-card">
+          <span class="feature-icon">調</span>
+          <strong>自由調整樣式</strong>
+          <p>字體、字重、顏色、背景形狀、透明背景與內距都可以自行設定。</p>
+        </article>
+        <article class="feature-card">
+          <span class="feature-icon">即</span>
+          <strong>即時預覽</strong>
+          <p>大型圖示、32px 與瀏覽器分頁效果同步更新，方便確認小尺寸可讀性。</p>
+        </article>
+      </section>
+
+      <section class="card generator-guide-card">
+        <div class="card-head">
+          <div>
+            <h2>產生後如何放到網站？</h2>
+            <p>下載 ZIP、解壓縮到網站根目錄，再把下方程式碼放進網站的 <code>&lt;head&gt;</code>。</p>
+          </div>
+          <button class="button button-outline" id="copyGeneratedHtmlButton" type="button">複製 HTML</button>
+        </div>
+        <div class="generator-guide-body">
+          <pre id="generatedHtmlCode"><code>&lt;link rel="icon" href="/favicon.ico" sizes="any"&gt;
+&lt;link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16"&gt;
+&lt;link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32"&gt;
+&lt;link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48"&gt;
+&lt;link rel="apple-touch-icon" href="/apple-touch-icon.png"&gt;
+&lt;link rel="manifest" href="/site.webmanifest"&gt;</code></pre>
+
+          <div class="format-grid">
+            <div><strong>favicon.ico</strong><span>傳統瀏覽器與相容性用途，內含 16 / 32 / 48px。</span></div>
+            <div><strong>PNG 圖示</strong><span>適合現代瀏覽器、捷徑與不同高解析尺寸。</span></div>
+            <div><strong>Apple Touch Icon</strong><span>180 × 180，適合加入 iPhone / iPad 主畫面。</span></div>
+            <div><strong>Web App Manifest</strong><span>包含 192 × 192 與 512 × 512，適合 PWA 與 Android。</span></div>
+          </div>
+        </div>
+      </section>
     </section>
 
     <section class="card legal-card">
       <div class="card-head">
         <div>
           <h2>使用與權利說明</h2>
-          <p>本工具只依使用者指定網址，即時讀取公開網站所提供的 Favicon 資訊；本專案不內建、不收錄第三方網站圖示或品牌 Logo。</p>
+          <p>本工具不內建第三方品牌 Logo；文字產生功能完全由使用者輸入內容在瀏覽器端建立。</p>
         </div>
       </div>
       <div class="legal-body">
-        <p>網站圖示可能受著作權、商標權或其他權利保護。偵測、預覽或下載功能僅提供技術上的檔案存取，不代表任何權利授權。若要將第三方圖示用於自己的網站、產品、宣傳或再次散布，請先確認你具有相應權利或授權。</p>
-        <p>請勿利用本工具存取未授權的內部網路、規避存取限制、進行大量自動化抓取，或從事違反適用法律、網站條款或第三方權利的用途。</p>
+        <p>網站偵測功能僅依使用者指定網址，即時讀取公開網站自行提供的 Favicon。第三方網站圖示可能受著作權、商標權或其他權利保護，下載不代表取得使用或散布授權。</p>
+        <p>文字轉 Favicon 會使用瀏覽器可用的系統字體繪製，不會下載或打包第三方字型檔。使用者仍應確認自己輸入的文字、名稱或商標具有適當使用權。</p>
       </div>
     </section>
 
     <footer>
-      Favicon Detector · Cloudflare Pages Functions 版 · 不內建第三方圖示
+      Favicon 工具箱 · 繁體中文 · Cloudflare Pages Functions
     </footer>
   </main>
 
