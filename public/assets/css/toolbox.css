@@ -1,6 +1,6 @@
 .toolbox-hero{padding-bottom:34px}
-.tool-switch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-width:650px;margin-top:28px;padding:7px;border:1px solid var(--line);border-radius:17px;background:rgba(255,255,255,.82);box-shadow:0 10px 26px rgba(20,58,48,.05)}
-.tool-tab{display:flex;align-items:center;justify-content:center;gap:9px;min-height:50px;border:0;border-radius:12px;background:transparent;color:var(--muted);font-weight:850;transition:.18s ease}
+.tool-switch{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;max-width:860px;margin-top:28px;padding:7px;border:1px solid var(--line);border-radius:17px;background:rgba(255,255,255,.82);box-shadow:0 10px 26px rgba(20,58,48,.05)}
+.tool-tab{display:flex;align-items:center;justify-content:center;gap:9px;min-height:46px;border:0;border-radius:12px;background:transparent;color:var(--muted);font-weight:700;transition:.18s ease}
 .tool-tab:hover{background:#f5f9f8;color:var(--text)}
 .tool-tab.active{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;box-shadow:0 8px 18px rgba(15,118,110,.16)}
 .tool-tab-kicker{padding:4px 6px;border-radius:7px;background:rgba(255,255,255,.18);font-size:10px;letter-spacing:.05em}
@@ -10,7 +10,7 @@
 .start-card-body{padding:0 20px 20px}
 .start-card .searchbar{margin-top:0}
 .section-kicker{display:block;margin-bottom:7px;color:var(--brand);font-size:10px;font-weight:900;letter-spacing:.11em}
-.generator-head h2{font-size:24px}
+.generator-head h2{font-size:20px}
 .generator-layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(340px,.95fr);gap:28px;padding:26px}
 .generator-controls{min-width:0}
 .generator-field-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px}
@@ -43,7 +43,7 @@
 .generator-preview-panel{display:flex;flex-direction:column;min-width:0;padding:18px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,#fbfdfc,#f5faf8)}
 .generator-preview-title{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
 .generator-preview-title>div{display:flex;flex-direction:column;gap:3px}
-.generator-preview-title span{font-size:13px;font-weight:900}
+.generator-preview-title span{font-size:12px;font-weight:800}
 .generator-preview-title small{color:var(--muted);font-size:10px}
 .live-dot{display:inline-flex!important;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;background:#e8f8ef;color:var(--ok);font-size:10px!important}
 .live-dot:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
@@ -62,7 +62,7 @@
 .feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
 .feature-card{padding:20px;border:1px solid var(--line);border-radius:17px;background:#fff;box-shadow:0 10px 26px rgba(20,58,48,.035)}
 .feature-icon{display:grid;place-items:center;width:38px;height:38px;margin-bottom:14px;border-radius:12px;background:var(--soft);color:var(--brand);font-weight:950}
-.feature-card strong{display:block;margin-bottom:7px;font-size:13px}.feature-card p{margin:0;color:var(--muted);font-size:11px;line-height:1.7}
+.feature-card strong{display:block;margin-bottom:7px;font-size:12px}.feature-card p{margin:0;color:var(--muted);font-size:11px;line-height:1.7}
 .generator-guide-card{margin-top:18px}
 .generator-guide-body{padding:22px}
 .generator-guide-body pre{margin:0;padding:18px;border-radius:14px;overflow:auto;background:#0f172a;color:#e5eefc;font-size:11px;line-height:1.7}
@@ -84,4 +84,57 @@ body.generator-open .legal-card{margin-top:22px}
   .wide-field{grid-column:auto}
   .generator-preview-stage{min-height:240px}
   #textPreviewLarge{width:190px}
+}
+
+/* 圖片轉 Favicon */
+.image-converter-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,.92fr);gap:28px;padding:26px}
+.upload-zone{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:220px;padding:28px;border:1.5px dashed #b8d5cf;border-radius:18px;background:linear-gradient(180deg,#fbfefd,#f4faf8);text-align:center;transition:.18s ease}
+.upload-zone.dragging{border-color:var(--brand);background:var(--soft);transform:translateY(-1px)}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.upload-icon{display:grid;place-items:center;width:52px;height:52px;margin-bottom:13px;border-radius:15px;background:#fff;color:var(--brand);box-shadow:0 8px 24px rgba(20,58,48,.08);font-size:22px;font-weight:800}
+.upload-zone strong{font-size:14px}
+.upload-zone p{margin:6px 0 0;color:var(--muted);font-size:11px;line-height:1.7}
+.upload-meta{display:flex;justify-content:space-between;gap:12px;margin-top:10px;color:var(--muted);font-size:10px}
+.image-control-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.image-preview-stage{display:grid;place-items:center;min-height:300px;border:1px solid var(--line);border-radius:17px;background:linear-gradient(45deg,#eef4f2 25%,transparent 25%),linear-gradient(-45deg,#eef4f2 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#eef4f2 75%),linear-gradient(-45deg,transparent 75%,#eef4f2 75%),#fff;background-size:18px 18px;background-position:0 0,0 9px,9px -9px,-9px 0}
+#imagePreviewLarge{width:min(230px,72%);height:auto;filter:drop-shadow(0 14px 24px rgba(30,60,52,.13))}
+.image-empty{max-width:240px;text-align:center;color:var(--muted);font-size:11px;line-height:1.7}
+.image-preview-panel{display:flex;flex-direction:column;min-width:0;padding:18px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,#fbfdfc,#f5faf8)}
+.image-action-note{margin:9px 0 0;color:var(--muted);font-size:10px;line-height:1.7}
+
+/* Favicon 新手說明 */
+.favicon-guide{margin-top:22px}
+.guide-intro{display:grid;grid-template-columns:.75fr 1.25fr;gap:22px;padding:24px}
+.guide-big-mark{display:flex;align-items:center;justify-content:center;min-height:180px;border-radius:18px;background:linear-gradient(135deg,#0f766e,#12a996);color:#fff}
+.guide-big-mark span{font-size:72px;font-weight:800;line-height:1}
+.guide-copy h3{margin:0 0 10px;font-size:19px}
+.guide-copy p{margin:0 0 10px;color:var(--muted);font-size:12px;line-height:1.9}
+.guide-copy p:last-child{margin-bottom:0}
+.guide-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:0 24px 24px}
+.guide-card{padding:17px;border:1px solid var(--line);border-radius:15px;background:#fbfdfc}
+.guide-card b{display:block;margin-bottom:7px;font-size:12px}
+.guide-card p{margin:0;color:var(--muted);font-size:10px;line-height:1.75}
+.install-steps{padding:0 24px 24px}
+.install-steps h3{margin:0 0 12px;font-size:15px}
+.install-list{counter-reset:steps;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.install-item{position:relative;padding:15px 15px 15px 46px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.install-item:before{counter-increment:steps;content:counter(steps);position:absolute;left:14px;top:14px;display:grid;place-items:center;width:24px;height:24px;border-radius:8px;background:var(--soft);color:var(--brand);font-size:11px;font-weight:800}
+.install-item strong{display:block;margin-bottom:4px;font-size:11px}
+.install-item span{display:block;color:var(--muted);font-size:10px;line-height:1.65}
+.faq-list{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 24px 24px}
+.faq-item{padding:15px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.faq-item strong{display:block;margin-bottom:5px;font-size:11px}
+.faq-item p{margin:0;color:var(--muted);font-size:10px;line-height:1.75}
+
+@media(max-width:980px){
+  .image-converter-layout{grid-template-columns:1fr}
+  .guide-intro{grid-template-columns:1fr}
+  .guide-big-mark{min-height:130px}
+  .guide-grid,.install-list{grid-template-columns:1fr}
+}
+@media(max-width:720px){
+  .tool-switch{grid-template-columns:1fr}
+  .image-converter-layout{padding:16px}
+  .image-control-grid,.faq-list{grid-template-columns:1fr}
+  .guide-intro,.guide-grid,.install-steps,.faq-list{padding-left:16px;padding-right:16px}
 }
