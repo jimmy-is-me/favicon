@@ -110,7 +110,7 @@ npm run dev
 ## 著作權、商標與合法使用
 
 - 本專案不內建第三方 Logo、圖片、付費字型或抄錄自其他網站的視覺資產。
-- 介面透過 Google Fonts 載入 Noto Serif TC；字型與 Google Fonts 服務仍受各自授權與服務條款規範。
+- 介面透過 Google Fonts 載入 Noto Sans TC；字型與 Google Fonts 服務仍受各自授權與服務條款規範。
 - 本工具只在使用者輸入網址後，即時解析該公開網站自行提供的 Favicon / Manifest 資訊。
 - 偵測到的第三方 Favicon **不會被收錄進此 GitHub repository**。
 - 第三方網站圖示的著作權、商標及其他權利仍屬各自權利人；能下載檔案不代表取得使用、重製、散布或商標授權。
