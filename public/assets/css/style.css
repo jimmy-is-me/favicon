@@ -213,7 +213,7 @@ body{
 h1{margin:0;font-size:clamp(36px,5.1vw,58px);line-height:1.15;letter-spacing:-.045em;text-wrap:balance}
 .hero-copy{max-width:780px;margin:20px auto 0;color:var(--muted);font-size:clamp(15px,1.55vw,18px);line-height:1.9;text-wrap:balance}
 
-.button{border-radius:14px;background:linear-gradient(135deg,var(--brand),var(--brand2));box-shadow:0 12px 28px rgba(13,130,89,.18);transition:transform .22s ease,box-shadow .22s ease,filter .22s ease,opacity .22s ease}
+.button{border-radius:14px;color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand2));box-shadow:0 12px 28px rgba(13,130,89,.18);transition:transform .22s ease,box-shadow .22s ease,filter .22s ease,opacity .22s ease}
 .button:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 16px 36px rgba(13,130,89,.22);filter:saturate(1.05)}
 .button-soft{color:#075b40;background:var(--soft);border:1px solid #aed7c4;box-shadow:none}
 .button-outline{color:#3d5148;background:rgba(255,255,255,.82);border:1px solid var(--line);box-shadow:none}
@@ -301,4 +301,14 @@ h1{margin:0;font-size:clamp(36px,5.1vw,58px);line-height:1.15;letter-spacing:-.0
   .hero-copy{font-size:15px}
   .footer-inner{flex-direction:column}
   .footer-links{flex-wrap:wrap}
+}
+
+/* Header CTA color consistency */
+.site-header .button-small,
+.site-header .button-small:link,
+.site-header .button-small:visited,
+.site-header .button-small:hover,
+.site-header .button-small:active{
+  color:#fff;
+  text-decoration:none;
 }
