@@ -163,7 +163,7 @@ body{
   background:linear-gradient(180deg,#fbfdfc 0%,#f4f8f6 38%,#eef5f1 100%);
   overflow-x:hidden;
 }
-.shell{width:min(1160px,calc(100% - 40px));margin-inline:auto}
+.shell{width:min(1160px,calc(100% - 40px));margin-inline:auto;padding:0}
 .main-shell{padding:0 0 60px}
 
 .ambient{position:fixed;z-index:-3;border-radius:50%;filter:blur(8px);pointer-events:none;opacity:.76;animation:wmDrift 13s ease-in-out infinite alternate}
@@ -312,3 +312,7 @@ h1{margin:0;font-size:clamp(36px,5.1vw,58px);line-height:1.15;letter-spacing:-.0
   color:#fff;
   text-decoration:none;
 }
+
+/* Header shell height fix */
+.site-header .header-inner{padding-top:0;padding-bottom:0}
+.site-footer .shell{padding-top:0;padding-bottom:0}
