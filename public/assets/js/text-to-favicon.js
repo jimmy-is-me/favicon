@@ -142,7 +142,9 @@
       tab.setAttribute('aria-selected', active ? 'true' : 'false');
     });
     document.body.classList.toggle('generator-open', targetId === 'generatorView');
-    history.replaceState(null, '', targetId === 'generatorView' ? '#text-to-favicon' : '#detector');
+    document.body.classList.toggle('image-open', targetId === 'imageView');
+    const hashes = { detectorView: '#detector', generatorView: '#text-to-favicon', imageView: '#image-to-favicon' };
+    history.replaceState(null, '', hashes[targetId] || '#detector');
     if (targetId === 'generatorView') renderPreviews();
   }
 
@@ -437,7 +439,11 @@
     notify.timer = setTimeout(() => toast.classList.remove('show'), 1800);
   }
 
-  const initialTarget = location.hash === '#text-to-favicon' ? 'generatorView' : 'detectorView';
+  const initialTarget = location.hash === '#text-to-favicon' ? 'generatorView' :
+    location.hash === '#image-to-favicon' ? 'imageView' : 'detectorView';
   switchTool(initialTarget);
   renderPreviews();
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(renderPreviews).catch(() => {});
+  }
 })();
