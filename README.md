@@ -52,6 +52,8 @@ npm run dev
 
 ## 功能
 
+### 網站 Favicon 偵測
+
 - 伺服器端抓取網站 HTML
 - 解析 `<link rel="icon">`
 - 解析 `apple-touch-icon`
@@ -66,6 +68,18 @@ npm run dev
 - 指定 16 / 32 / 48 / 64 / 128 / 180 / 192 / 256 / 512 尺寸並轉為 PNG
 - 手機 RWD
 - 內建「檢查 API」功能
+
+### 文字轉 Favicon
+
+- 全介面繁體中文
+- 輸入中英文、數字或 Emoji 即時產生網站圖示
+- 字體、字重、文字大小、前景色、背景色、透明背景、背景形狀、內距與文字陰影可調
+- 即時大型預覽、32px 預覽與瀏覽器分頁模擬
+- 下載 512 × 512 PNG
+- 下載內含 16 / 32 / 48px PNG 的 `favicon.ico`
+- 一鍵產生完整 ZIP：`favicon.ico`、16/32/48 PNG、Apple Touch Icon、Android 192/512 PNG、`site.webmanifest`
+- 直接複製建議的 `<head>` Favicon HTML
+- 文字圖示在瀏覽器端 Canvas 產生，不需外部 API，也不打包第三方字型檔
 
 ## 為什麼這版能真的偵測？
 
@@ -117,3 +131,8 @@ npm run dev
 - **相容模式：** Build output directory = repository root → 使用根目錄 `index.html`
 
 若要完整使用 Favicon 偵測 API，仍需確認根目錄的 `functions/` 有被 Cloudflare Pages Functions 部署。
+
+
+## 文字產生器的權利設計
+
+文字轉 Favicon 功能使用瀏覽器本機可用的系統字體與 Canvas 產生圖像，repository 不包含第三方付費字型、Logo 或圖庫素材。使用者仍應自行確認輸入的品牌名稱、商標、文字或其他內容具有適當使用權。
