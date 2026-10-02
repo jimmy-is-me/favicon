@@ -137,3 +137,168 @@ footer{text-align:center;padding:28px 0 0;color:#889490;font-size:12px}
 }
 
 .legal-card{margin-top:22px}.legal-body{padding:18px 24px 22px;color:var(--muted);font-size:14px;line-height:1.85}.legal-body p{margin:0 0 10px}.legal-body p:last-child{margin-bottom:0}
+
+
+/* =========================================================
+   WUMETAX Domain Lookup visual system
+   參考同品牌工具站的版面語言，保留 Favicon 工具本身結構
+   ========================================================= */
+:root{
+  --bg:#f4f8f6;
+  --card:rgba(255,255,255,.9);
+  --text:#16251f;
+  --muted:#6d7d76;
+  --line:#d9e5df;
+  --line-strong:#c7d8cf;
+  --brand:#0d8259;
+  --brand2:#109565;
+  --soft:#e9f6f0;
+  --ok:#087f5b;
+  --shadow:0 24px 64px rgba(19,50,37,.08);
+  --shadow-soft:0 14px 36px rgba(19,50,37,.055);
+  --radius:22px;
+}
+
+body{
+  background:linear-gradient(180deg,#fbfdfc 0%,#f4f8f6 38%,#eef5f1 100%);
+  overflow-x:hidden;
+}
+.shell{width:min(1160px,calc(100% - 40px));margin-inline:auto}
+.main-shell{padding:0 0 60px}
+
+.ambient{position:fixed;z-index:-3;border-radius:50%;filter:blur(8px);pointer-events:none;opacity:.76;animation:wmDrift 13s ease-in-out infinite alternate}
+.ambient-a{width:470px;height:470px;top:-180px;right:-150px;background:radial-gradient(circle,rgba(93,201,145,.24),transparent 68%)}
+.ambient-b{width:390px;height:390px;top:560px;left:-170px;background:radial-gradient(circle,rgba(184,223,117,.2),transparent 68%);animation-duration:16s}
+.ambient-grid{position:fixed;inset:0;z-index:-4;pointer-events:none;opacity:.22;background-image:linear-gradient(rgba(10,109,75,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(10,109,75,.035) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.7),transparent 70%)}
+@keyframes wmDrift{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(24px,18px,0) scale(1.06)}}
+
+.site-header{position:sticky;top:0;z-index:40;background:rgba(251,253,252,.86);backdrop-filter:blur(18px);border-bottom:1px solid rgba(199,216,207,.72)}
+.header-inner{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;min-width:0;color:var(--text)}
+.brand-logo{width:46px;height:46px;object-fit:cover;border-radius:50%;background:#fff;border:1px solid var(--line);box-shadow:0 8px 22px rgba(13,130,89,.12);transition:transform .35s ease,box-shadow .35s ease}
+.brand:hover .brand-logo{transform:rotate(-4deg) scale(1.04);box-shadow:0 12px 28px rgba(13,130,89,.18)}
+.brand-copy{display:grid;line-height:1.15}
+.brand-copy strong{font-size:15px;letter-spacing:.12em}
+.brand-copy small{margin-top:4px;color:var(--muted);font-size:10px;letter-spacing:.17em}
+.header-actions{display:flex;align-items:center;gap:18px}
+.text-link{text-decoration:none;color:#405149;font-size:14px;font-weight:650}
+.text-link:hover{color:var(--brand)}
+.button-small{padding:10px 15px;border-radius:11px;font-size:13px}
+
+.hero{
+  padding:76px 0 48px;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  text-align:center;
+  overflow:visible;
+}
+.hero:after{display:none}
+.eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin:0 0 18px;
+  padding:0;
+  border-radius:0;
+  background:transparent;
+  color:var(--brand);
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.17em;
+}
+.pulse{width:8px;height:8px;border-radius:50%;background:#b8df75;box-shadow:0 0 0 6px rgba(184,223,117,.18);animation:wmPulse 2s ease-in-out infinite}
+@keyframes wmPulse{50%{box-shadow:0 0 0 11px rgba(184,223,117,0);transform:scale(1.12)}}
+h1{margin:0;font-size:clamp(36px,5.1vw,58px);line-height:1.15;letter-spacing:-.045em;text-wrap:balance}
+.hero-copy{max-width:780px;margin:20px auto 0;color:var(--muted);font-size:clamp(15px,1.55vw,18px);line-height:1.9;text-wrap:balance}
+
+.button{border-radius:14px;background:linear-gradient(135deg,var(--brand),var(--brand2));box-shadow:0 12px 28px rgba(13,130,89,.18);transition:transform .22s ease,box-shadow .22s ease,filter .22s ease,opacity .22s ease}
+.button:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 16px 36px rgba(13,130,89,.22);filter:saturate(1.05)}
+.button-soft{color:#075b40;background:var(--soft);border:1px solid #aed7c4;box-shadow:none}
+.button-outline{color:#3d5148;background:rgba(255,255,255,.82);border:1px solid var(--line);box-shadow:none}
+.button-outline:hover:not(:disabled),.button-soft:hover:not(:disabled){border-color:#8fc2aa;background:#fff;color:var(--brand)}
+
+.card{
+  background:rgba(255,255,255,.9);
+  border:1px solid var(--line);
+  border-radius:24px;
+  box-shadow:var(--shadow-soft);
+  backdrop-filter:blur(10px);
+}
+.card:hover{border-color:#c9dcd3}
+.card-head{padding:22px 24px 19px;border-bottom:1px solid #e7efeb}
+.card-head h2{font-size:20px;letter-spacing:-.015em}
+.card-head p{color:var(--muted);font-size:14px}
+
+.start-card{margin-bottom:14px}
+.start-card-body{padding:0 18px 18px}
+.searchbar{
+  margin-top:0;
+  padding:10px;
+  border:1px solid rgba(199,216,207,.95);
+  border-radius:18px;
+  background:#fff;
+  box-shadow:none;
+}
+.searchbar input{
+  height:56px;
+  padding:0 16px;
+  border-radius:13px;
+  background:#f6faf8;
+  transition:background .2s ease,box-shadow .2s ease;
+}
+.searchbar input:focus{background:#fff;box-shadow:0 0 0 4px rgba(13,130,89,.08)}
+.searchbar .button{min-height:56px}
+.top-grid{gap:14px;margin-top:14px}
+.acquire-card,.diagnostic-card{margin-top:14px}
+
+.results{padding:14px}
+.result-item{border-color:#e0eae5;border-radius:16px;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+.result-item:hover{transform:translateY(-2px);border-color:#b9d8c9;box-shadow:0 12px 28px rgba(18,49,36,.06)}
+.summary-box{background:linear-gradient(145deg,#0d8259,#08704d);box-shadow:0 16px 40px rgba(13,130,89,.16)}
+.summary-item{background:#f7faf8;border-color:#e4ece8}
+.small-button{background:rgba(255,255,255,.9);border-color:var(--line);transition:transform .18s ease,border-color .18s ease,color .18s ease}
+.small-button:hover{transform:translateY(-1px);border-color:#8fc2aa;color:var(--brand)}
+
+.large-preview,.generator-preview-stage,.image-preview-stage{border-color:#dce8e2;background:linear-gradient(45deg,#f1f6f3 25%,transparent 25%),linear-gradient(-45deg,#f1f6f3 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#f1f6f3 75%),linear-gradient(-45deg,transparent 75%,#f1f6f3 75%),#fff;background-size:18px 18px;background-position:0 0,0 9px,9px -9px,-9px 0}
+.field input,.field select,.wide-field input,.color-input-row input[type=text]{background:#f6faf8;border-color:#dbe7e1}
+.field input:focus,.field select:focus,.wide-field input:focus,.color-input-row input[type=text]:focus{outline:none;border-color:#97cbb3;box-shadow:0 0 0 4px rgba(13,130,89,.08);background:#fff}
+
+.legal-card{margin-top:14px}
+
+/* WUMETAX-style footer */
+.site-footer{padding:34px 0 28px;background:rgba(247,250,248,.8);border-top:1px solid var(--line)}
+.footer-inner{display:flex;justify-content:space-between;align-items:flex-start;gap:24px}
+.footer-brand{display:flex;align-items:center;gap:13px}
+.footer-brand img{width:42px;height:42px;object-fit:cover;border-radius:50%;background:#fff;border:1px solid var(--line)}
+.footer-brand strong{font-size:14px;letter-spacing:.08em}
+.footer-brand p{margin:4px 0 0;color:var(--muted);font-size:12px}
+.footer-links{display:flex;gap:16px;font-size:13px}
+.footer-links a{text-decoration:none;color:var(--text)}
+.footer-links a:hover{color:var(--brand)}
+.footer-bottom{margin-top:24px;padding-top:18px;border-top:1px solid #e5ece8;color:#8b9992;font-size:11px}
+
+/* subtle motion, same family as Domain Lookup */
+.reveal{animation:wmRise .7s cubic-bezier(.2,.7,.2,1) both}
+@keyframes wmRise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
+@media(max-width:900px){
+  .shell{width:min(100% - 28px,1160px)}
+  .hero{padding:56px 0 36px}
+  .header-actions{gap:10px}
+  .text-link{font-size:13px}
+}
+@media(max-width:720px){
+  .header-inner{min-height:68px}
+  .brand-logo{width:40px;height:40px}
+  .brand-copy strong{font-size:13px}
+  .brand-copy small{font-size:9px}
+  .header-actions .text-link{display:none}
+  .button-small{padding:9px 12px;font-size:12px}
+  .hero{padding:44px 0 30px}
+  h1{font-size:clamp(32px,10vw,44px)}
+  .hero-copy{font-size:15px}
+  .footer-inner{flex-direction:column}
+  .footer-links{flex-wrap:wrap}
+}
