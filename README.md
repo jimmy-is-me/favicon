@@ -69,6 +69,16 @@ npm run dev
 - 手機 RWD
 - 內建「檢查 API」功能
 
+### 圖片轉 Favicon
+
+- 上傳 PNG / JPG / JPEG 直接轉成網站圖示
+- 圖片完全在瀏覽器本機處理，不上傳伺服器
+- 支援完整顯示與填滿裁切
+- 可調整背景顏色、透明背景、形狀與內距
+- 即時預覽大型圖示、32px 圖示與瀏覽器分頁效果
+- 下載 512 × 512 PNG、favicon.ico 或完整網站圖示 ZIP
+- ZIP 內含 16/32/48 PNG、Apple Touch Icon、Android 192/512 PNG 與 site.webmanifest
+
 ### 文字轉 Favicon
 
 - 全介面繁體中文
@@ -99,7 +109,8 @@ npm run dev
 
 ## 著作權、商標與合法使用
 
-- 本專案程式碼與介面不包含第三方 Logo、圖片、外部字型或抄錄自其他網站的視覺資產。
+- 本專案不內建第三方 Logo、圖片、付費字型或抄錄自其他網站的視覺資產。
+- 介面透過 Google Fonts 載入 Noto Serif TC；字型與 Google Fonts 服務仍受各自授權與服務條款規範。
 - 本工具只在使用者輸入網址後，即時解析該公開網站自行提供的 Favicon / Manifest 資訊。
 - 偵測到的第三方 Favicon **不會被收錄進此 GitHub repository**。
 - 第三方網站圖示的著作權、商標及其他權利仍屬各自權利人；能下載檔案不代表取得使用、重製、散布或商標授權。
@@ -136,3 +147,14 @@ npm run dev
 ## 文字產生器的權利設計
 
 文字轉 Favicon 功能使用瀏覽器本機可用的系統字體與 Canvas 產生圖像，repository 不包含第三方付費字型、Logo 或圖庫素材。使用者仍應自行確認輸入的品牌名稱、商標、文字或其他內容具有適當使用權。
+
+
+## Favicon 新手說明
+
+網站內新增完整說明區，介紹 Favicon 會出現在哪裡、16/32/180/192/512 等常用尺寸的用途、favicon.ico / PNG / Apple Touch Icon / Web App Manifest 的差異，以及如何將產生後的檔案放進網站。
+
+三種工具可以依需求選擇：
+
+1. **網站 Favicon 偵測**：已有網站，想確認目前實際使用哪些圖示。
+2. **文字轉 Favicon**：沒有 Logo 圖檔，用品牌縮寫、文字或 Emoji 快速建立。
+3. **圖片轉 Favicon**：已有 PNG / JPG Logo 或圖片，直接轉成完整網站圖示包。
