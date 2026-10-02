@@ -6,6 +6,7 @@
 
 - 前端 HTML / CSS / JavaScript 與 Cloudflare Pages Functions 程式碼為本專案自行建立的實作。
 - Repository 不內建第三方品牌 Logo、Favicon、照片、插圖、付費字型或其他第三方視覺素材。
+- 前端介面會透過 Google Fonts 載入 Noto Serif TC；該字型檔與 Google Fonts 服務不屬於本 repository，其授權、隱私與服務條款由相應提供者規範。
 - 未使用從其他網站複製的版型、文案或程式碼片段作為專案內容。
 - `wrangler` 僅列為開發相依套件，並未把其原始碼複製進本 repository；其使用仍受該套件自己的授權條款約束。
 - Cloudflare、WordPress、Apple、Microsoft 等名稱若出現在說明文字中，只用於描述相容技術或格式，不表示官方合作、授權或背書。
@@ -38,3 +39,10 @@
 ## 授權
 
 本 repository 目前標示為 `UNLICENSED`，未授予一般公開重製、修改、散布或再授權本專案程式碼的權利。若日後要開源，應另行加入適合的開源授權條款。
+
+
+## 使用者圖片與文字產生功能
+
+- 「文字轉 Favicon」與「圖片轉 Favicon」都在使用者瀏覽器本機透過 Canvas 執行，不會由本專案主動將文字內容或上傳圖片傳送至伺服器。
+- 使用者應確保輸入的品牌名稱、商標、文字、Logo、照片或其他圖片具有適當使用權。
+- 產生出的 favicon 檔案本身不代表取得原始商標、字型、圖片或其他第三方素材的額外授權。
