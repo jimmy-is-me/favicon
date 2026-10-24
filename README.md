@@ -22,6 +22,8 @@ favicon-detector-cloudflare/
 
 ## Cloudflare Pages 部署方式（建議 GitHub）
 
+也相容目前以專案根目錄作為輸出目錄的部署：根目錄 `index.html` 由 `public/index.html` 產生，資源路徑改為 `/public/assets/`。修改頁面後執行 `npm run sync:entry`，並執行 `npm test` 確認兩份入口一致。只改 `public/index.html` 不會更新根目錄部署的首頁。
+
 1. 把 **整個專案** 推到 GitHub，不是只推 `public/index.html`。
 2. Cloudflare → Workers & Pages → Create → Pages → Connect to Git。
 3. Framework preset：`None`

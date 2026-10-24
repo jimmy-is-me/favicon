@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "wrangler pages dev public",
     "deploy": "wrangler pages deploy public",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "sync:entry": "node scripts/sync-entry.mjs"
   },
   "devDependencies": {
     "wrangler": "^4.0.0"
