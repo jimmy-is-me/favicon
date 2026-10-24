@@ -63,3 +63,9 @@ h1{font-size:clamp(32px,5vw,60px);font-weight:900;letter-spacing:-.035em}
 @media(max-width:720px){.header-inner{min-height:72px;gap:10px}.brand{gap:8px}.brand-mark{width:40px;height:40px;flex-basis:40px;font-size:24px}.brand-copy strong{font-size:15px}.brand-copy small{font-size:9px}.lab-badge{font-size:10px;padding:2px 5px}.header-actions .button-small{font-size:11px;padding:10px}.hero-copy{font-size:14px}.tool-switch{gap:4px;padding:4px}.tool-tab{flex-direction:column;gap:5px;font-size:12px;padding:9px 4px}.tool-tab-kicker{font-size:9px}.card-head{padding:18px}.card-head h2{font-size:18px}.footer-links{gap:14px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation:none!important;transition:none!important}}
 @media(max-width:480px){.header-actions{display:none}.brand-copy strong{font-size:16px}.brand-copy small{font-size:10px}}
+
+/* Optional size improvements are information, not repair warnings. */
+.google-check.info{background:#f8fafc;color:#475569;border:1px solid #e2e8f0;border-left:3px solid #94a3b8}
+.google-check.info p{font-weight:400}
+.google-check details{margin-top:8px}
+.google-check summary{cursor:pointer;font-size:12px;font-weight:400}

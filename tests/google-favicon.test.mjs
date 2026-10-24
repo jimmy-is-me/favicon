@@ -76,7 +76,8 @@ test('frontend renders warning and old API unknown state while retaining acquisi
   const document = {getElementById(id) { if (!elements.has(id)) elements.set(id,new Element()); return elements.get(id); }, createElement(){const e = new Element(); created.push(e); return e;}};
   const icons = [
     {url:'https://example.com/a.webp',contentType:'image/webp', googleSearch:check(new Uint8Array(),'image/webp')},
-    {url:'https://example.com/legacy.png',contentType:'image/png'}
+    {url:'https://example.com/legacy.png',contentType:'image/png'},
+    {url:'https://example.com/small.png',contentType:'image/png',googleSearch:check(png(32),'image/png')}
   ];
   vm.runInNewContext(await readFile(new URL('../public/assets/js/app.js',import.meta.url),'utf8'),{
     document,URL,Image:class {}, fetch:async()=>({ok:true,json:async()=>({ok:true,icons})})
@@ -89,8 +90,12 @@ test('frontend renders warning and old API unknown state while retaining acquisi
   assert.ok(panels[0].innerHTML.includes(WEBP_WARNING));
   assert.ok(panels[1].innerHTML.includes('無法確認'));
   assert.ok(panels[0].innerHTML.includes('https://developers.google.com/search/docs/appearance/favicon-in-search'));
-  assert.equal(rows.length,2);
+  assert.equal(rows.length,3);
+  assert.equal(panels[2].className,'google-check info');
+  assert.ok(panels[2].innerHTML.includes('無須僅因尺寸建議立即更改'));
+  assert.ok(panels[2].innerHTML.includes('符合基本格式與尺寸條件'));
+  assert.equal(panels[0].className,'google-check warn');
   assert.equal(elements.get('faviconUrl').value,icons[0].url);
   assert.equal(elements.get('downloadOriginalButton').disabled,false);
-  assert.equal(elements.get('summaryCount').textContent,'2');
+  assert.equal(elements.get('summaryCount').textContent,'3');
 });

@@ -170,15 +170,15 @@
 
       const check = icon.googleSearch;
       const panel = document.createElement('div');
-      const labels = { compatible: '格式與建議尺寸符合', warning: '尺寸提醒', unsupported: '不符合', unknown: '無法確認' };
-      panel.className = 'google-check ' + (check?.status === 'compatible' ? 'good' : 'warn');
+      const labels = { compatible: '格式與建議尺寸符合', warning: '符合基本格式與尺寸條件', unsupported: '不符合', unknown: '無法確認' };
+      panel.className = 'google-check ' + (check?.status === 'compatible' ? 'good' : check?.status === 'warning' || check?.status === 'unknown' ? 'info' : 'warn');
       const formatLabel = { supported: '官方支援', unsupported: '未列入官方支援', unknown: '無法確認' };
       const actual = check?.dimensions?.map(d => d.width + '×' + d.height).join('、') || '無法確認';
       panel.innerHTML = '<strong>Google 搜尋：' + escapeHtml(labels[check?.status] || '無法確認') + '</strong>'
         + '<div>格式：' + escapeHtml(formatLabel[check?.format] || '無法確認') + '｜實際尺寸：' + escapeHtml(actual) + '</div>'
         + (check?.messages || ['API 未提供相容性資料，無法確認。']).map(message => '<p>' + escapeHtml(message) + '</p>').join('')
-        + '<small>僅檢查格式與尺寸；首頁宣告、Googlebot／Googlebot-Image 抓取權限、網址穩定性與品牌內容無法確認。符合也不保證顯示。</small>'
-        + '<a href="https://developers.google.com/search/docs/appearance/favicon-in-search" target="_blank" rel="noopener noreferrer">Google 官方規範</a>';
+        + '<details><summary>檢查範圍與官方說明</summary><small>僅檢查格式與尺寸；其他條件尚未檢查，不代表網站有問題。Google 建議大於 48×48 以提升清晰度，並非最低要求。是否顯示仍由 Google 決定。</small>'
+        + '<a href="https://developers.google.com/search/docs/appearance/favicon-in-search" target="_blank" rel="noopener noreferrer">Google 官方規範</a></details>';
       item.querySelector('.result-info').appendChild(panel);
 
       item.querySelector('.choose-button').addEventListener('click', () => {
