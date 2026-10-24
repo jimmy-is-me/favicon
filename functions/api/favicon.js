@@ -1,3 +1,5 @@
+import { checkGoogleFavicon } from '../../lib/google-favicon.mjs';
+
 const HTML_LIMIT = 1_500_000;
 const MAX_CANDIDATES = 18;
 const REQUEST_TIMEOUT_MS = 7000;
@@ -367,6 +369,7 @@ async function verifyOne(item) {
       ok: true,
       status: response.status,
       contentType: detectedType,
+      googleSearch: checkGoogleFavicon(bytes, detectedType),
       contentLength: Number(response.headers.get('content-length') || 0) || 0
     };
   } catch (_) {

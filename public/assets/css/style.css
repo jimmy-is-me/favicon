@@ -316,3 +316,11 @@ h1{margin:0;font-size:clamp(36px,5.1vw,58px);line-height:1.15;letter-spacing:-.0
 /* Header shell height fix */
 .site-header .header-inner{padding-top:0;padding-bottom:0}
 .site-footer .shell{padding-top:0;padding-bottom:0}
+
+/* Search compatibility follows the existing responsive result column. */
+.result-info{min-width:0}
+.google-check{margin-top:12px;padding:12px;border:1px solid #e7ba67;border-left:4px solid #ad6700;border-radius:10px;background:#fff8e9;color:#704400;font-size:13px;line-height:1.7;overflow-wrap:anywhere}
+.google-check.good{border-color:#a3cdb7;background:#f1faf5;color:#196241}
+.google-check p{margin:6px 0;font-weight:600}
+.google-check small{display:block;font-size:12px}
+.google-check a{display:inline-block;margin-top:6px;color:inherit;text-decoration:underline}

@@ -41,6 +41,16 @@ Cloudflare 會自動讀取專案根目錄的 `functions/`，建立：
 
 ## 本機測試
 
+執行 `npm test` 可測試 Google 搜尋格式、真實檔頭尺寸、ICO 多尺寸、32px 提醒、未知資料及偵測 API 契約。
+
+### Google 搜尋 Favicon 相容性
+
+偵測結果的每個圖示新增 `googleSearch` 欄位（`status`、`format`、`size`、`dimensions`、`messages`、`guidelinesUrl`），原有欄位與排序不變。前端在結果清單逐筆顯示相容性與醒目提醒，舊 API 未提供此欄位時顯示「無法確認」。
+
+依據 [Google 官方文件](https://developers.google.com/search/docs/appearance/favicon-in-search)（2026-10-24 查核）：支援 BMP、GIF、ICO、PNG、JPEG、PPM、TIFF；WebP、SVG、AVIF 未列入。尺寸最低為正方形 8×8，建議大於 48×48，並非必須為 48 的倍數。32×32、48×48 顯示尺寸提醒，不標示為符合建議尺寸。
+
+尺寸只採用檔案內容，不相信網址副檔名、HTTP MIME 或 HTML `sizes`。PNG、GIF、JPEG、BMP 與 ICO 目錄可讀取尺寸；目前 TIFF、PPM 或超出讀取上限的檔頭尺寸顯示「無法確認」。檔頭檢查不等於完整圖片解碼。首頁宣告、Googlebot 抓取權限、網址穩定性、品牌及內容政策需另行確認；本工具不保證 Google 搜尋一定顯示圖示。
+
 需有 Node.js：
 
 ```bash
